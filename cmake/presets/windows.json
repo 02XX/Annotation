@@ -1,0 +1,262 @@
+{
+    "version": 6,
+    "include": [
+        "common.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "base-platform-windows",
+            "hidden": true,
+            "description": "Windows target platform",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Clang Debug",
+            "description": "Configure a Debug build with Clang and Ninja",
+            "inherits": [
+                "base-clang",
+                "base-platform-windows",
+                "base-debug"
+            ]
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Clang Release",
+            "description": "Configure a Release build with Clang and Ninja",
+            "inherits": [
+                "base-clang",
+                "base-platform-windows",
+                "base-release"
+            ]
+        },
+        {
+            "name": "msvc-debug",
+            "displayName": "MSVC Debug",
+            "description": "Configure a Debug build with MSVC and Ninja",
+            "inherits": [
+                "base-msvc",
+                "base-platform-windows",
+                "base-debug"
+            ]
+        },
+        {
+            "name": "msvc-release",
+            "displayName": "MSVC Release",
+            "description": "Configure a Release build with MSVC and Ninja",
+            "inherits": [
+                "base-msvc",
+                "base-platform-windows",
+                "base-release"
+            ]
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "base-build-platform-windows",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Build Clang Debug",
+            "configurePreset": "clang-debug",
+            "inherits": "base-build-platform-windows"
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Build Clang Release",
+            "configurePreset": "clang-release",
+            "inherits": "base-build-platform-windows"
+        },
+        {
+            "name": "msvc-debug",
+            "displayName": "Build MSVC Debug",
+            "configurePreset": "msvc-debug",
+            "inherits": "base-build-platform-windows"
+        },
+        {
+            "name": "msvc-release",
+            "displayName": "Build MSVC Release",
+            "configurePreset": "msvc-release",
+            "inherits": "base-build-platform-windows"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "base-test-platform-windows",
+            "hidden": true,
+            "inherits": "base-test",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Test Clang Debug",
+            "inherits": "base-test-platform-windows",
+            "configurePreset": "clang-debug"
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Test Clang Release",
+            "inherits": "base-test-platform-windows",
+            "configurePreset": "clang-release"
+        },
+        {
+            "name": "msvc-debug",
+            "displayName": "Test MSVC Debug",
+            "inherits": "base-test-platform-windows",
+            "configurePreset": "msvc-debug"
+        },
+        {
+            "name": "msvc-release",
+            "displayName": "Test MSVC Release",
+            "inherits": "base-test-platform-windows",
+            "configurePreset": "msvc-release"
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "base-package-platform-windows",
+            "hidden": true,
+            "inherits": "base-package",
+            "generators": [
+                "ZIP"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Package Clang Debug",
+            "inherits": "base-package-platform-windows",
+            "configurePreset": "clang-debug"
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Package Clang Release",
+            "inherits": "base-package-platform-windows",
+            "configurePreset": "clang-release"
+        },
+        {
+            "name": "msvc-debug",
+            "displayName": "Package MSVC Debug",
+            "inherits": "base-package-platform-windows",
+            "configurePreset": "msvc-debug"
+        },
+        {
+            "name": "msvc-release",
+            "displayName": "Package MSVC Release",
+            "inherits": "base-package-platform-windows",
+            "configurePreset": "msvc-release"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "clang-debug",
+            "displayName": "Clang Debug Workflow",
+            "description": "Configure, build, test, and package the Clang Debug variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "clang-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "clang-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "clang-debug"
+                },
+                {
+                    "type": "package",
+                    "name": "clang-debug"
+                }
+            ]
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Clang Release Workflow",
+            "description": "Configure, build, test, and package the Clang Release variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "clang-release"
+                },
+                {
+                    "type": "build",
+                    "name": "clang-release"
+                },
+                {
+                    "type": "test",
+                    "name": "clang-release"
+                },
+                {
+                    "type": "package",
+                    "name": "clang-release"
+                }
+            ]
+        },
+        {
+            "name": "msvc-debug",
+            "displayName": "MSVC Debug Workflow",
+            "description": "Configure, build, test, and package the MSVC Debug variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "msvc-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "msvc-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "msvc-debug"
+                },
+                {
+                    "type": "package",
+                    "name": "msvc-debug"
+                }
+            ]
+        },
+        {
+            "name": "msvc-release",
+            "displayName": "MSVC Release Workflow",
+            "description": "Configure, build, test, and package the MSVC Release variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "msvc-release"
+                },
+                {
+                    "type": "build",
+                    "name": "msvc-release"
+                },
+                {
+                    "type": "test",
+                    "name": "msvc-release"
+                },
+                {
+                    "type": "package",
+                    "name": "msvc-release"
+                }
+            ]
+        }
+    ]
+}

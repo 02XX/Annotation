@@ -1,0 +1,94 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "description": "Common project configuration",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/install/${presetName}",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "base-vcpkg",
+            "hidden": true,
+            "description": "Common vcpkg configuration",
+            "inherits": "base",
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+            "cacheVariables": {
+                "X_VCPKG_APPLOCAL_DEPS_INSTALL": "ON"
+            }
+        },
+        {
+            "name": "base-clang",
+            "hidden": true,
+            "description": "Clang toolchain",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "base-gcc",
+            "hidden": true,
+            "description": "GCC toolchain",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "base-msvc",
+            "hidden": true,
+            "description": "MSVC toolchain",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            }
+        },
+        {
+            "name": "base-debug",
+            "hidden": true,
+            "description": "Debug build configuration",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "base-release",
+            "hidden": true,
+            "description": "Release build configuration",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "base-test",
+            "hidden": true,
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "base-package",
+            "hidden": true,
+            "generators": [
+                "ZIP"
+            ],
+            "packageDirectory": "${sourceDir}/packages/${presetName}",
+            "output": {
+                "verbose": true
+            }
+        }
+    ]
+}

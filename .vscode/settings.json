@@ -1,0 +1,5 @@
+{
+    "cmake.configureEnvironment": {
+        "CMAKE_PREFIX_PATH": "/opt/homebrew/opt/qt@5"
+    }
+}

@@ -1,0 +1,160 @@
+{
+    "version": 6,
+    "include": [
+        "common.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "base-platform-macos",
+            "hidden": true,
+            "description": "macOS native platform",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        },
+        {
+            "name": "clang-macos-debug",
+            "displayName": "Clang macOS Debug",
+            "description": "Configure a native macOS Debug build with Clang and Ninja",
+            "inherits": [
+                "base-clang",
+                "base-platform-macos",
+                "base-debug"
+            ]
+        },
+        {
+            "name": "clang-macos-release",
+            "displayName": "Clang macOS Release",
+            "description": "Configure a native macOS Release build with Clang and Ninja",
+            "inherits": [
+                "base-clang",
+                "base-platform-macos",
+                "base-release"
+            ]
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "base-build-platform-macos",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        },
+        {
+            "name": "clang-macos-debug",
+            "displayName": "Build Clang macOS Debug",
+            "configurePreset": "clang-macos-debug",
+            "inherits": "base-build-platform-macos"
+        },
+        {
+            "name": "clang-macos-release",
+            "displayName": "Build Clang macOS Release",
+            "configurePreset": "clang-macos-release",
+            "inherits": "base-build-platform-macos"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "base-test-platform-macos",
+            "hidden": true,
+            "inherits": "base-test",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        },
+        {
+            "name": "clang-macos-debug",
+            "displayName": "Test Clang macOS Debug",
+            "inherits": "base-test-platform-macos",
+            "configurePreset": "clang-macos-debug"
+        },
+        {
+            "name": "clang-macos-release",
+            "displayName": "Test Clang macOS Release",
+            "inherits": "base-test-platform-macos",
+            "configurePreset": "clang-macos-release"
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "base-package-platform-macos",
+            "hidden": true,
+            "inherits": "base-package",
+            "generators": [
+                "DragNDrop"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        },
+        {
+            "name": "clang-macos-debug",
+            "displayName": "Package Clang macOS Debug",
+            "inherits": "base-package-platform-macos",
+            "configurePreset": "clang-macos-debug"
+        },
+        {
+            "name": "clang-macos-release",
+            "displayName": "Package Clang macOS Release",
+            "inherits": "base-package-platform-macos",
+            "configurePreset": "clang-macos-release"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "clang-macos-debug",
+            "displayName": "Clang macOS Debug Workflow",
+            "description": "Configure, build, test, and package the Clang macOS Debug variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "clang-macos-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "clang-macos-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "clang-macos-debug"
+                },
+                {
+                    "type": "package",
+                    "name": "clang-macos-debug"
+                }
+            ]
+        },
+        {
+            "name": "clang-macos-release",
+            "displayName": "Clang macOS Release Workflow",
+            "description": "Configure, build, test, and package the Clang macOS Release variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "clang-macos-release"
+                },
+                {
+                    "type": "build",
+                    "name": "clang-macos-release"
+                },
+                {
+                    "type": "test",
+                    "name": "clang-macos-release"
+                },
+                {
+                    "type": "package",
+                    "name": "clang-macos-release"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,262 @@
+{
+    "version": 6,
+    "include": [
+        "common.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "base-platform-linux",
+            "hidden": true,
+            "description": "Linux native platform",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "gcc-linux-debug",
+            "displayName": "GCC Linux Debug",
+            "description": "Configure a native Linux Debug build with GCC and Ninja",
+            "inherits": [
+                "base-gcc",
+                "base-platform-linux",
+                "base-debug"
+            ]
+        },
+        {
+            "name": "gcc-linux-release",
+            "displayName": "GCC Linux Release",
+            "description": "Configure a native Linux Release build with GCC and Ninja",
+            "inherits": [
+                "base-gcc",
+                "base-platform-linux",
+                "base-release"
+            ]
+        },
+        {
+            "name": "clang-linux-debug",
+            "displayName": "Clang Linux Debug",
+            "description": "Configure a native Linux Debug build with Clang and Ninja",
+            "inherits": [
+                "base-clang",
+                "base-platform-linux",
+                "base-debug"
+            ]
+        },
+        {
+            "name": "clang-linux-release",
+            "displayName": "Clang Linux Release",
+            "description": "Configure a native Linux Release build with Clang and Ninja",
+            "inherits": [
+                "base-clang",
+                "base-platform-linux",
+                "base-release"
+            ]
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "base-build-platform-linux",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "gcc-linux-debug",
+            "displayName": "Build GCC Linux Debug",
+            "configurePreset": "gcc-linux-debug",
+            "inherits": "base-build-platform-linux"
+        },
+        {
+            "name": "gcc-linux-release",
+            "displayName": "Build GCC Linux Release",
+            "configurePreset": "gcc-linux-release",
+            "inherits": "base-build-platform-linux"
+        },
+        {
+            "name": "clang-linux-debug",
+            "displayName": "Build Clang Linux Debug",
+            "configurePreset": "clang-linux-debug",
+            "inherits": "base-build-platform-linux"
+        },
+        {
+            "name": "clang-linux-release",
+            "displayName": "Build Clang Linux Release",
+            "configurePreset": "clang-linux-release",
+            "inherits": "base-build-platform-linux"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "base-test-platform-linux",
+            "hidden": true,
+            "inherits": "base-test",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "gcc-linux-debug",
+            "displayName": "Test GCC Linux Debug",
+            "inherits": "base-test-platform-linux",
+            "configurePreset": "gcc-linux-debug"
+        },
+        {
+            "name": "gcc-linux-release",
+            "displayName": "Test GCC Linux Release",
+            "inherits": "base-test-platform-linux",
+            "configurePreset": "gcc-linux-release"
+        },
+        {
+            "name": "clang-linux-debug",
+            "displayName": "Test Clang Linux Debug",
+            "inherits": "base-test-platform-linux",
+            "configurePreset": "clang-linux-debug"
+        },
+        {
+            "name": "clang-linux-release",
+            "displayName": "Test Clang Linux Release",
+            "inherits": "base-test-platform-linux",
+            "configurePreset": "clang-linux-release"
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "base-package-platform-linux",
+            "hidden": true,
+            "inherits": "base-package",
+            "generators": [
+                "TGZ"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "gcc-linux-debug",
+            "displayName": "Package GCC Linux Debug",
+            "inherits": "base-package-platform-linux",
+            "configurePreset": "gcc-linux-debug"
+        },
+        {
+            "name": "gcc-linux-release",
+            "displayName": "Package GCC Linux Release",
+            "inherits": "base-package-platform-linux",
+            "configurePreset": "gcc-linux-release"
+        },
+        {
+            "name": "clang-linux-debug",
+            "displayName": "Package Clang Linux Debug",
+            "inherits": "base-package-platform-linux",
+            "configurePreset": "clang-linux-debug"
+        },
+        {
+            "name": "clang-linux-release",
+            "displayName": "Package Clang Linux Release",
+            "inherits": "base-package-platform-linux",
+            "configurePreset": "clang-linux-release"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "gcc-linux-debug",
+            "displayName": "GCC Linux Debug Workflow",
+            "description": "Configure, build, test, and package the GCC Linux Debug variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "gcc-linux-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "gcc-linux-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "gcc-linux-debug"
+                },
+                {
+                    "type": "package",
+                    "name": "gcc-linux-debug"
+                }
+            ]
+        },
+        {
+            "name": "gcc-linux-release",
+            "displayName": "GCC Linux Release Workflow",
+            "description": "Configure, build, test, and package the GCC Linux Release variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "gcc-linux-release"
+                },
+                {
+                    "type": "build",
+                    "name": "gcc-linux-release"
+                },
+                {
+                    "type": "test",
+                    "name": "gcc-linux-release"
+                },
+                {
+                    "type": "package",
+                    "name": "gcc-linux-release"
+                }
+            ]
+        },
+        {
+            "name": "clang-linux-debug",
+            "displayName": "Clang Linux Debug Workflow",
+            "description": "Configure, build, test, and package the Clang Linux Debug variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "clang-linux-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "clang-linux-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "clang-linux-debug"
+                },
+                {
+                    "type": "package",
+                    "name": "clang-linux-debug"
+                }
+            ]
+        },
+        {
+            "name": "clang-linux-release",
+            "displayName": "Clang Linux Release Workflow",
+            "description": "Configure, build, test, and package the Clang Linux Release variant",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "clang-linux-release"
+                },
+                {
+                    "type": "build",
+                    "name": "clang-linux-release"
+                },
+                {
+                    "type": "test",
+                    "name": "clang-linux-release"
+                },
+                {
+                    "type": "package",
+                    "name": "clang-linux-release"
+                }
+            ]
+        }
+    ]
+}
