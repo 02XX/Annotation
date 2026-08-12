@@ -29,5 +29,5 @@ if(BUILD_TESTS)
 endif()
 
 # ---- Engine source ----
-add_subdirectory(annotation)
+add_subdirectory(totcad)
 
