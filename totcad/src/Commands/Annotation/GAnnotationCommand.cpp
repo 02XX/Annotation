@@ -1,4 +1,4 @@
-#include "Command/GAnnotationCommand.hpp"
+#include "Commands/Annotation/GAnnotationCommand.hpp"
 
 namespace totcad {
 

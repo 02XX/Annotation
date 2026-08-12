@@ -1,4 +1,4 @@
-#include "Command/Type/GMoveTypeCommand.hpp"
+#include "Commands/Annotation/Type/GMoveTypeCommand.hpp"
 namespace totcad {
 GMoveTypeCommand::GMoveTypeCommand(GAnnotationModel *document, QString typeId, int offset)
     : GAnnotationCommand(document, offset < 0 ? QObject::tr("上移类型") : QObject::tr("下移类型")),

@@ -1,5 +1,5 @@
 #pragma once
-#include "Command/GAnnotationCommand.hpp"
+#include "Commands/Annotation/GAnnotationCommand.hpp"
 namespace totcad {
 class GRenameTypeCommand final : public GAnnotationCommand {
 public: GRenameTypeCommand(GAnnotationModel *document, QString typeId, QString name);

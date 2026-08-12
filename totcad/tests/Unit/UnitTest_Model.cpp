@@ -1,5 +1,5 @@
-#include "Command/Assignment/GAssignInstanceCommand.hpp"
-#include "Command/Type/GDeleteTypeCommand.hpp"
+#include "Commands/Annotation/Assignment/GAssignInstanceCommand.hpp"
+#include "Commands/Annotation/Type/GDeleteTypeCommand.hpp"
 #include "Model/GAnnotationModel.hpp"
 #include "Model/GDXFModel.hpp"
 #include "Model/Entities/GLineEntity.hpp"

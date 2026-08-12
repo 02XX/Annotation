@@ -34,9 +34,7 @@ void GLayerTableModel::setDrawing(GDXFModel *drawing)
     m_drawing = drawing;
     m_layerNames.clear();
     if (drawing) {
-        m_layerNames.reserve(drawing->layers().size());
-        for (const auto &entry : drawing->layers())
-            m_layerNames.push_back(entry.first);
+        m_layerNames = QVector<QString>::fromList(drawing->layers().keys());
         std::sort(m_layerNames.begin(), m_layerNames.end());
     }
     endResetModel();
@@ -51,9 +49,12 @@ int GLayerTableModel::columnCount(const QModelIndex &parent) const { return pare
 QVariant GLayerTableModel::data(const QModelIndex &index, int role) const
 {
     if (!m_drawing || !index.isValid()
-        || static_cast<std::size_t>(index.row()) >= m_layerNames.size())
+        || index.row() >= m_layerNames.size())
         return {};
-    const GLayerEntity &layer = m_drawing->layers().at(m_layerNames.at(index.row()));
+    const auto layerIt = m_drawing->layers().constFind(m_layerNames.at(index.row()));
+    if (layerIt == m_drawing->layers().cend())
+        return {};
+    const GLayerEntity &layer = layerIt.value();
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case 0: return layer.name;
@@ -90,7 +91,7 @@ bool GLayerTableModel::setData(const QModelIndex &index, const QVariant &value, 
 {
     if (!m_drawing || role != Qt::CheckStateRole || index.column() != 4)
         return false;
-    const std::string &layerName = m_layerNames.at(index.row());
+    const QString &layerName = m_layerNames.at(index.row());
     const bool visible = value.toInt() == Qt::Checked;
     if (!m_drawing->setLayerVisible(layerName, visible))
         return false;

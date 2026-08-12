@@ -1,4 +1,4 @@
-#include "Command/Type/GRenameTypeCommand.hpp"
+#include "Commands/Annotation/Type/GRenameTypeCommand.hpp"
 namespace totcad {
 GRenameTypeCommand::GRenameTypeCommand(GAnnotationModel *document, QString typeId, QString name)
     : GAnnotationCommand(document, QObject::tr("重命名类型")), m_typeId(std::move(typeId)), m_name(std::move(name)) {}

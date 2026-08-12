@@ -1,5 +1,5 @@
 #pragma once
-#include "Command/GAnnotationCommand.hpp"
+#include "Commands/Annotation/GAnnotationCommand.hpp"
 namespace totcad {
 class GDeleteTypeCommand final : public GAnnotationCommand {
 public: GDeleteTypeCommand(GAnnotationModel *document, QString typeId);

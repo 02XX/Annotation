@@ -1,5 +1,5 @@
 #pragma once
-#include "Command/GAnnotationCommand.hpp"
+#include "Commands/Annotation/GAnnotationCommand.hpp"
 namespace totcad {
 class GChangeTypeColorCommand final : public GAnnotationCommand {
 public: GChangeTypeColorCommand(GAnnotationModel *document, QString typeId, QColor color);

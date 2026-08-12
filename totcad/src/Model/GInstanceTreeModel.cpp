@@ -1,6 +1,6 @@
 #include "Model/GInstanceTreeModel.hpp"
 
-#include "Command/Instance/GRenameInstanceCommand.hpp"
+#include "Commands/Annotation/Instance/GRenameInstanceCommand.hpp"
 #include "Model/GAnnotationModel.hpp"
 
 #include <QUndoStack>

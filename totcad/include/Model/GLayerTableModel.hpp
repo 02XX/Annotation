@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QAbstractTableModel>
-#include <string>
-#include <vector>
+#include <QString>
+#include <QVector>
 
 namespace totcad {
 
@@ -23,7 +23,7 @@ public:
 
 private:
     GDXFModel *m_drawing{nullptr};
-    std::vector<std::string> m_layerNames;
+    QVector<QString> m_layerNames;
 };
 
 } // namespace totcad

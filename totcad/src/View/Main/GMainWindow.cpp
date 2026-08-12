@@ -382,7 +382,7 @@ void GMainWindow::updateRecentFiles()
 void GMainWindow::updateStatus()
 {
     const bool open = m_fileController->hasDrawing();
-    m_pathLabel->setText(open ? QString::fromUtf8(m_cadDocument->sourcePath().c_str())
+    m_pathLabel->setText(open ? m_cadDocument->sourcePath()
                               : tr("未打开文件"));
     m_entityCountLabel->setText(tr("实体：%1").arg(open ? m_cadDocument->entityCount() : 0));
     m_typeCountLabel->setText(tr("类型标注：%1").arg(m_annotationDocument->assignedTypeEntityCount()));
@@ -408,7 +408,7 @@ void GMainWindow::updateWindowTitle()
     if (m_fileController->hasDrawing())
         title = QStringLiteral("%1%2 — %3")
                     .arg(m_fileController->isModified() ? QStringLiteral("*") : QString{},
-                         QFileInfo(QString::fromUtf8(m_cadDocument->sourcePath().c_str())).fileName(),
+                         QFileInfo(m_cadDocument->sourcePath()).fileName(),
                          title);
     setWindowTitle(title);
 }

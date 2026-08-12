@@ -110,8 +110,8 @@ void GGraphicsScene::addEntity(const std::shared_ptr<GEntity> &entity, EntityID 
 {
     if (!entity || insertionDepth > 16)
         return;
-    const auto layerIt = m_document->layers().find(entity->layerName.toStdString());
-    if (layerIt != m_document->layers().end() && !layerIt->second.visible)
+    const auto layerIt = m_document->layers().constFind(entity->layerName);
+    if (layerIt != m_document->layers().cend() && !layerIt.value().visible)
         return;
 
     if (const auto insert = std::dynamic_pointer_cast<GInsertEntity>(entity))
@@ -121,7 +121,7 @@ void GGraphicsScene::addEntity(const std::shared_ptr<GEntity> &entity, EntityID 
         insertItem->setTransform(transform);
         addItem(insertItem);
 
-        const GBlockEntity *block = m_document->block(insert->blockName.toStdString());
+        const GBlockEntity *block = m_document->block(insert->blockName);
         if (!block)
             return;
         QTransform insertion;
@@ -203,9 +203,9 @@ QColor GGraphicsScene::entityColor(const GEntity &entity, EntityID selectionId) 
         return aciColor(entity.colorIndex);
     if (m_document)
     {
-        const auto it = m_document->layers().find(entity.layerName.toStdString());
-        if (it != m_document->layers().end())
-            return aciColor(it->second.colorIndex);
+        const auto it = m_document->layers().constFind(entity.layerName);
+        if (it != m_document->layers().cend())
+            return aciColor(it.value().colorIndex);
     }
     return Qt::white;
 }
@@ -216,23 +216,23 @@ QPen GGraphicsScene::entityPen(const GEntity &entity, EntityID selectionId) cons
     double lineWidth = 0.0;
     if (m_document)
     {
-        const auto layer = m_document->layers().find(entity.layerName.toStdString());
-        if (layer != m_document->layers().end())
+        const auto layer = m_document->layers().constFind(entity.layerName);
+        if (layer != m_document->layers().cend())
         {
             if (lineTypeName.compare(QStringLiteral("BYLAYER"), Qt::CaseInsensitive) == 0)
-                lineTypeName = layer->second.lineTypeName;
-            lineWidth = layer->second.lineWidth;
+                lineTypeName = layer.value().lineTypeName;
+            lineWidth = layer.value().lineWidth;
         }
     }
     QPen pen(entityColor(entity, selectionId), lineWidth > 0.0 ? qMax(1.0, lineWidth * 2.0) : 0.0);
     pen.setCosmetic(true);
     if (m_document)
     {
-        const auto lineType = m_document->lineTypes().find(lineTypeName.toStdString());
-        if (lineType != m_document->lineTypes().end() && !lineType->second.pattern.isEmpty())
+        const auto lineType = m_document->lineTypes().constFind(lineTypeName);
+        if (lineType != m_document->lineTypes().cend() && !lineType.value().pattern.isEmpty())
         {
             QVector<qreal> dashPattern;
-            for (double element : lineType->second.pattern)
+            for (double element : lineType.value().pattern)
                 dashPattern.append(qMax(0.5, qAbs(element)));
             if (dashPattern.size() % 2 != 0)
                 dashPattern += dashPattern;

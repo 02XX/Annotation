@@ -1,13 +1,13 @@
 #include "Controller/GAnnotationController.hpp"
 
-#include "Command/Assignment/GAssignInstanceCommand.hpp"
-#include "Command/Assignment/GAssignTypeCommand.hpp"
-#include "Command/Instance/GAddInstanceCommand.hpp"
-#include "Command/Instance/GDeleteInstanceCommand.hpp"
-#include "Command/Type/GAddTypeCommand.hpp"
-#include "Command/Type/GChangeTypeColorCommand.hpp"
-#include "Command/Type/GDeleteTypeCommand.hpp"
-#include "Command/Type/GMoveTypeCommand.hpp"
+#include "Commands/Annotation/Assignment/GAssignInstanceCommand.hpp"
+#include "Commands/Annotation/Assignment/GAssignTypeCommand.hpp"
+#include "Commands/Annotation/Instance/GAddInstanceCommand.hpp"
+#include "Commands/Annotation/Instance/GDeleteInstanceCommand.hpp"
+#include "Commands/Annotation/Type/GAddTypeCommand.hpp"
+#include "Commands/Annotation/Type/GChangeTypeColorCommand.hpp"
+#include "Commands/Annotation/Type/GDeleteTypeCommand.hpp"
+#include "Commands/Annotation/Type/GMoveTypeCommand.hpp"
 
 #include <QUndoStack>
 

@@ -1,7 +1,6 @@
 #include "IO/DXF/GDXFLoader.hpp"
 
 #include "IO/DXF/Reader.hpp"
-#include "Model/GDXFModel.hpp"
 #include "Model/Entities/GArcEntity.hpp"
 #include "Model/Entities/GCircleEntity.hpp"
 #include "Model/Entities/GDimensionEntity.hpp"
@@ -11,8 +10,10 @@
 #include "Model/Entities/GPointEntity.hpp"
 #include "Model/Entities/GPolylineEntity.hpp"
 #include "Model/Entities/GTextEntity.hpp"
+#include "Model/GDXFModel.hpp"
 
 #include <QColor>
+#include <QVector>
 
 #include <charconv>
 #include <cmath>
@@ -22,9 +23,11 @@
 #include <unordered_set>
 #include <utility>
 
-namespace totcad {
+namespace totcad
+{
 
-namespace {
+namespace
+{
 
 using dxf::Record;
 
@@ -50,14 +53,22 @@ QPointF point(const Record &record, int xCode)
 
 QColor aciColor(int colorIndex)
 {
-    switch (std::abs(colorIndex)) {
-    case 1: return Qt::red;
-    case 2: return Qt::yellow;
-    case 3: return Qt::green;
-    case 4: return Qt::cyan;
-    case 5: return Qt::blue;
-    case 6: return Qt::magenta;
-    case 7: return Qt::white;
+    switch (std::abs(colorIndex))
+    {
+    case 1:
+        return Qt::red;
+    case 2:
+        return Qt::yellow;
+    case 3:
+        return Qt::green;
+    case 4:
+        return Qt::cyan;
+    case 5:
+        return Qt::blue;
+    case 6:
+        return Qt::magenta;
+    case 7:
+        return Qt::white;
     default:
         return QColor::fromHsv(((std::abs(colorIndex) - 10) * 17) % 360, 180, 230);
     }
@@ -65,18 +76,20 @@ QColor aciColor(int colorIndex)
 
 class IdSource final
 {
-public:
+  public:
     EntityID idFor(const Record &record)
     {
         EntityID candidate = 0;
-        if (const auto handle = record.stringValue(5)) {
+        if (const auto handle = record.stringValue(5))
+        {
             const char *begin = handle->data();
             const char *end = begin + handle->size();
             const auto parsed = std::from_chars(begin, end, candidate, 16);
             if (parsed.ec != std::errc{} || parsed.ptr != end)
                 candidate = 0;
         }
-        if (candidate == 0 || m_used.count(candidate) != 0) {
+        if (candidate == 0 || m_used.count(candidate) != 0)
+        {
             while (m_used.count(m_next) != 0)
                 ++m_next;
             candidate = m_next++;
@@ -85,7 +98,7 @@ public:
         return candidate;
     }
 
-private:
+  private:
     EntityID m_next{1};
     std::unordered_set<EntityID> m_used;
 };
@@ -105,35 +118,46 @@ std::shared_ptr<GEntity> makeSimpleEntity(const Record &record, IdSource &ids)
     std::shared_ptr<GEntity> entity;
     const EntityID id = ids.idFor(record);
 
-    if (record.type == "POINT") {
+    if (record.type == "POINT")
+    {
         auto value = std::make_shared<GPointEntity>(id);
         value->position = point(record, 10);
         entity = std::move(value);
-    } else if (record.type == "LINE") {
+    }
+    else if (record.type == "LINE")
+    {
         auto value = std::make_shared<GLineEntity>(id);
         value->start = point(record, 10);
         value->end = point(record, 11);
         entity = std::move(value);
-    } else if (record.type == "CIRCLE") {
+    }
+    else if (record.type == "CIRCLE")
+    {
         auto value = std::make_shared<GCircleEntity>(id);
         value->center = point(record, 10);
         value->radius = number(record, 40);
         entity = std::move(value);
-    } else if (record.type == "ARC") {
+    }
+    else if (record.type == "ARC")
+    {
         auto value = std::make_shared<GArcEntity>(id);
         value->center = point(record, 10);
         value->radius = number(record, 40);
         value->startAngle = number(record, 50);
         value->endAngle = number(record, 51);
         entity = std::move(value);
-    } else if (record.type == "TEXT" || record.type == "MTEXT") {
+    }
+    else if (record.type == "TEXT" || record.type == "MTEXT")
+    {
         auto value = std::make_shared<GTextEntity>(id);
         value->position = point(record, 10);
         value->text = text(record.stringValue(1));
         value->height = number(record, 40, 2.5);
         value->rotation = number(record, 50);
         entity = std::move(value);
-    } else if (record.type == "INSERT") {
+    }
+    else if (record.type == "INSERT")
+    {
         auto value = std::make_shared<GInsertEntity>(id);
         value->blockName = text(record.stringValue(2));
         value->position = point(record, 10);
@@ -141,7 +165,9 @@ std::shared_ptr<GEntity> makeSimpleEntity(const Record &record, IdSource &ids)
         value->scaleY = number(record, 42, 1.0);
         value->rotation = number(record, 50);
         entity = std::move(value);
-    } else if (record.type == "DIMENSION") {
+    }
+    else if (record.type == "DIMENSION")
+    {
         auto value = std::make_shared<GDimensionEntity>(id);
         value->blockName = text(record.stringValue(2));
         value->text = text(record.stringValue(1));
@@ -171,15 +197,21 @@ std::shared_ptr<GPolylineEntity> makeLightweightPolyline(const Record &record, I
         entity->bulges.push_back(bulge);
     };
 
-    for (const dxf::Group &group : record.groups) {
-        if (group.code == 10) {
+    for (const dxf::Group &group : record.groups)
+    {
+        if (group.code == 10)
+        {
             appendVertex();
             vertex = {group.toDouble().value_or(0.0), 0.0};
             bulge = 0.0;
             hasVertex = true;
-        } else if (group.code == 20 && hasVertex) {
+        }
+        else if (group.code == 20 && hasVertex)
+        {
             vertex.setY(group.toDouble().value_or(0.0));
-        } else if (group.code == 42 && hasVertex) {
+        }
+        else if (group.code == 42 && hasVertex)
+        {
             bulge = group.toDouble().value_or(0.0);
         }
     }
@@ -187,16 +219,15 @@ std::shared_ptr<GPolylineEntity> makeLightweightPolyline(const Record &record, I
     return entity;
 }
 
-std::shared_ptr<GPolylineEntity> makePolyline(const Record &header,
-                                               const std::vector<Record> &records,
-                                               std::size_t &index,
-                                               IdSource &ids)
+std::shared_ptr<GPolylineEntity> makePolyline(const Record &header, const std::vector<Record> &records,
+                                              std::size_t &index, IdSource &ids)
 {
     auto entity = std::make_shared<GPolylineEntity>(ids.idFor(header));
     setCommonFields(header, *entity);
     entity->closed = (integer(header, 70) & 1) != 0;
 
-    for (++index; index < records.size() && records[index].type != "SEQEND"; ++index) {
+    for (++index; index < records.size() && records[index].type != "SEQEND"; ++index)
+    {
         if (records[index].type != "VERTEX")
             continue;
         entity->vertices.push_back(point(records[index], 10));
@@ -219,12 +250,16 @@ std::shared_ptr<GHatchEntity> makeHatch(const Record &record, IdSource &ids)
         if (hasVertex)
             boundary.push_back(vertex);
     };
-    for (const dxf::Group &group : record.groups) {
-        if (group.code == 10) {
+    for (const dxf::Group &group : record.groups)
+    {
+        if (group.code == 10)
+        {
             appendVertex();
             vertex = {group.toDouble().value_or(0.0), 0.0};
             hasVertex = true;
-        } else if (group.code == 20 && hasVertex) {
+        }
+        else if (group.code == 20 && hasVertex)
+        {
             vertex.setY(group.toDouble().value_or(0.0));
         }
     }
@@ -234,19 +269,26 @@ std::shared_ptr<GHatchEntity> makeHatch(const Record &record, IdSource &ids)
     return entity;
 }
 
-std::vector<std::shared_ptr<GEntity>> makeEntities(const std::vector<Record> &records,
-                                                    IdSource &ids)
+QVector<std::shared_ptr<GEntity>> makeEntities(const std::vector<Record> &records, IdSource &ids)
 {
-    std::vector<std::shared_ptr<GEntity>> entities;
-    for (std::size_t index = 0; index < records.size(); ++index) {
+    QVector<std::shared_ptr<GEntity>> entities;
+    for (std::size_t index = 0; index < records.size(); ++index)
+    {
         std::shared_ptr<GEntity> entity;
-        if (records[index].type == "LWPOLYLINE") {
+        if (records[index].type == "LWPOLYLINE")
+        {
             entity = makeLightweightPolyline(records[index], ids);
-        } else if (records[index].type == "POLYLINE") {
+        }
+        else if (records[index].type == "POLYLINE")
+        {
             entity = makePolyline(records[index], records, index, ids);
-        } else if (records[index].type == "HATCH") {
+        }
+        else if (records[index].type == "HATCH")
+        {
             entity = makeHatch(records[index], ids);
-        } else {
+        }
+        else
+        {
             entity = makeSimpleEntity(records[index], ids);
         }
         if (entity)
@@ -257,12 +299,15 @@ std::vector<std::shared_ptr<GEntity>> makeEntities(const std::vector<Record> &re
 
 void importTables(const dxf::DXFDocument &source, GDXFModel &target)
 {
-    if (const dxf::Table *table = source.findTable("LTYPE")) {
-        for (const Record &record : table->records) {
+    if (const dxf::Table *table = source.findTable("LTYPE"))
+    {
+        for (const Record &record : table->records)
+        {
             GLineTypeEntity lineType;
             lineType.name = text(record.stringValue(2));
             lineType.description = text(record.stringValue(3));
-            for (const dxf::Group &group : record.groups) {
+            for (const dxf::Group &group : record.groups)
+            {
                 if (group.code == 49)
                     lineType.pattern.push_back(group.toDouble().value_or(0.0));
             }
@@ -271,8 +316,10 @@ void importTables(const dxf::DXFDocument &source, GDXFModel &target)
         }
     }
 
-    if (const dxf::Table *table = source.findTable("LAYER")) {
-        for (const Record &record : table->records) {
+    if (const dxf::Table *table = source.findTable("LAYER"))
+    {
+        for (const Record &record : table->records)
+        {
             GLayerEntity layer;
             layer.name = text(record.stringValue(2));
             layer.colorIndex = integer(record, 62, 7);
@@ -288,7 +335,8 @@ void importTables(const dxf::DXFDocument &source, GDXFModel &target)
 
 void importBlocks(const dxf::DXFDocument &source, GDXFModel &target, IdSource &ids)
 {
-    for (const dxf::Block &sourceBlock : source.blocks) {
+    for (const dxf::Block &sourceBlock : source.blocks)
+    {
         GBlockEntity block;
         block.name = text(sourceBlock.definition.stringValue(2));
         block.basePoint = point(sourceBlock.definition, 10);
@@ -300,13 +348,12 @@ void importBlocks(const dxf::DXFDocument &source, GDXFModel &target, IdSource &i
 
 } // namespace
 
-bool GDXFLoader::load(const std::string &filePath,
-                      GDXFModel &drawing,
-                      std::string *errorMessage) const
+bool GDXFLoader::load(const std::string &filePath, GDXFModel &drawing, std::string *errorMessage) const
 {
     dxf::DXFDocument source;
     std::string error;
-    if (!dxf::Reader{}.readFile(std::filesystem::u8path(filePath), source, &error)) {
+    if (!dxf::Reader{}.readFile(std::filesystem::u8path(filePath), source, &error))
+    {
         if (errorMessage)
             *errorMessage = error;
         return false;
@@ -318,7 +365,7 @@ bool GDXFLoader::load(const std::string &filePath,
     importBlocks(source, parsed, ids);
     for (auto &entity : makeEntities(source.entities, ids))
         parsed.addEntity(std::move(entity));
-    parsed.setSourcePath(filePath);
+    parsed.setSourcePath(QString::fromUtf8(filePath.c_str()));
     drawing.replaceWith(std::move(parsed));
     if (errorMessage)
         errorMessage->clear();

@@ -1,4 +1,4 @@
-#include "Command/Type/GAddTypeCommand.hpp"
+#include "Commands/Annotation/Type/GAddTypeCommand.hpp"
 
 namespace totcad {
 GAddTypeCommand::GAddTypeCommand(GAnnotationModel *document) : GAnnotationCommand(document, QObject::tr("新增类型")) {}

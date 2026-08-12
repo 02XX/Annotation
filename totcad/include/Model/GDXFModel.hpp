@@ -5,13 +5,12 @@
 #include "Model/Entities/GLineTypeEntity.hpp"
 #include "Model/Entities/GSpaceEntity.hpp"
 
+#include <QHash>
 #include <QObject>
+#include <QString>
+#include <QVector>
 #include <memory>
-#include <string>
-#include <string_view>
-#include <unordered_map>
 #include <utility>
-#include <vector>
 
 namespace totcad
 {
@@ -38,25 +37,25 @@ public:
     void addLayer(GLayerEntity layer);
     void addLineType(GLineTypeEntity lineType);
     void addBlock(GBlockEntity block);
-    bool setLayerVisible(std::string_view name, bool visible);
+    bool setLayerVisible(const QString &name, bool visible);
 
-    const std::vector<std::shared_ptr<GEntity>> &entities() const noexcept
+    const QVector<std::shared_ptr<GEntity>> &entities() const noexcept
     {
         return m_entities;
     }
-    const std::unordered_map<std::string, GLayerEntity> &layers() const noexcept
+    const QHash<QString, GLayerEntity> &layers() const noexcept
     {
         return m_layers;
     }
-    const std::unordered_map<std::string, GLineTypeEntity> &lineTypes() const noexcept
+    const QHash<QString, GLineTypeEntity> &lineTypes() const noexcept
     {
         return m_lineTypes;
     }
-    const std::unordered_map<std::string, GBlockEntity> &blocks() const noexcept
+    const QHash<QString, GBlockEntity> &blocks() const noexcept
     {
         return m_blocks;
     }
-    const GBlockEntity *block(std::string_view name) const noexcept;
+    const GBlockEntity *block(const QString &name) const noexcept;
     std::shared_ptr<GEntity> entity(EntityID id) const;
 
     const GSpaceEntity &modelSpace() const noexcept
@@ -67,11 +66,11 @@ public:
     {
         return m_paperSpace;
     }
-    const std::string &sourcePath() const noexcept
+    const QString &sourcePath() const noexcept
     {
         return m_sourcePath;
     }
-    void setSourcePath(std::string path)
+    void setSourcePath(QString path)
     {
         m_sourcePath = std::move(path);
     }
@@ -87,14 +86,14 @@ signals:
     void layerVisibilityChanged();
 
 private:
-    std::vector<std::shared_ptr<GEntity>> m_entities;
-    std::unordered_map<EntityID, std::shared_ptr<GEntity>> m_entityById;
-    std::unordered_map<std::string, GLayerEntity> m_layers;
-    std::unordered_map<std::string, GLineTypeEntity> m_lineTypes;
-    std::unordered_map<std::string, GBlockEntity> m_blocks;
+    QVector<std::shared_ptr<GEntity>> m_entities;
+    QHash<EntityID, std::shared_ptr<GEntity>> m_entityById;
+    QHash<QString, GLayerEntity> m_layers;
+    QHash<QString, GLineTypeEntity> m_lineTypes;
+    QHash<QString, GBlockEntity> m_blocks;
     GSpaceEntity m_modelSpace{QStringLiteral("Model"), false, {}};
     GSpaceEntity m_paperSpace{QStringLiteral("Paper"), true, {}};
-    std::string m_sourcePath;
+    QString m_sourcePath;
 };
 
 } // namespace totcad

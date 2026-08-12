@@ -1,6 +1,6 @@
 #include "Model/GTypeTableModel.hpp"
 
-#include "Command/Type/GRenameTypeCommand.hpp"
+#include "Commands/Annotation/Type/GRenameTypeCommand.hpp"
 #include "Model/GAnnotationModel.hpp"
 
 #include <QBrush>

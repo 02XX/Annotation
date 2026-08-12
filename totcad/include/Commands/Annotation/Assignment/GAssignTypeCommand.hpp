@@ -1,5 +1,5 @@
 #pragma once
-#include "Command/GAnnotationCommand.hpp"
+#include "Commands/Annotation/GAnnotationCommand.hpp"
 #include "Model/Entities/GEntity.hpp"
 namespace totcad {
 class GAssignTypeCommand final : public GAnnotationCommand {

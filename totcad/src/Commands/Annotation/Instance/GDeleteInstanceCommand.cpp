@@ -1,4 +1,4 @@
-#include "Command/Instance/GDeleteInstanceCommand.hpp"
+#include "Commands/Annotation/Instance/GDeleteInstanceCommand.hpp"
 namespace totcad {
 GDeleteInstanceCommand::GDeleteInstanceCommand(GAnnotationModel *document, QString instanceId)
     : GAnnotationCommand(document, QObject::tr("删除实例")), m_instanceId(std::move(instanceId)) {}

@@ -82,7 +82,7 @@ void GFileController::close()
 
 bool GFileController::hasDrawing() const
 {
-    return !m_drawing->sourcePath().empty();
+    return !m_drawing->sourcePath().isEmpty();
 }
 
 bool GFileController::isModified() const
@@ -92,7 +92,7 @@ bool GFileController::isModified() const
 
 QString GFileController::annotationFilePath() const
 {
-    const QFileInfo info(QString::fromUtf8(m_drawing->sourcePath().c_str()));
+    const QFileInfo info(m_drawing->sourcePath());
     return info.absolutePath() + QLatin1Char('/') + info.completeBaseName() + QStringLiteral(".json");
 }
 
