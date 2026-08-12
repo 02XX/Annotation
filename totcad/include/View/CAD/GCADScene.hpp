@@ -3,6 +3,7 @@
 #include <QGraphicsScene>
 #include <QHash>
 #include <QList>
+#include <QPen>
 #include <memory>
 
 namespace totcad {
@@ -32,6 +33,7 @@ private:
                    const QTransform &transform,
                    int insertionDepth = 0);
     QColor entityColor(const GCADEntity &entity, const QString &selectionId) const;
+    QPen entityPen(const GCADEntity &entity, const QString &selectionId) const;
 
     GCADDocument *m_cadDocument{nullptr};
     GAnnotationDocument *m_annotationDocument{nullptr};

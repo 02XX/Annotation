@@ -2,6 +2,8 @@
 
 #include <QAbstractItemModel>
 
+class QUndoStack;
+
 namespace totcad {
 
 class GAnnotationDocument;
@@ -10,7 +12,7 @@ class GInstanceTreeModel final : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    explicit GInstanceTreeModel(GAnnotationDocument *document, QObject *parent = nullptr);
+    explicit GInstanceTreeModel(GAnnotationDocument *document, QUndoStack *undoStack, QObject *parent = nullptr);
     QModelIndex index(int row, int column, const QModelIndex &parent = {}) const override;
     QModelIndex parent(const QModelIndex &child) const override;
     int rowCount(const QModelIndex &parent = {}) const override;
@@ -26,6 +28,7 @@ public:
 
 private:
     GAnnotationDocument *m_document;
+    QUndoStack *m_undoStack;
     QString m_typeId;
 };
 

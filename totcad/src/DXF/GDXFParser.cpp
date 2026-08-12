@@ -112,6 +112,8 @@ void parseEntities(const QVector<Record> &source,
 
         if (record.first == QLatin1String("POLYLINE")) {
             auto polyline = std::dynamic_pointer_cast<GCADPolyline>(entity);
+            polyline->vertices.clear();
+            polyline->bulges.clear();
             int vertexIndex = i + 1;
             while (vertexIndex < source.size() && source.at(vertexIndex).first == QLatin1String("VERTEX")) {
                 const auto &groups = source.at(vertexIndex).second;

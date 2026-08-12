@@ -1,11 +1,14 @@
 #include "Model/GInstanceTreeModel.hpp"
 
+#include "Command/Instance/GRenameInstanceCommand.hpp"
 #include "Model/Annotation/GAnnotationDocument.hpp"
+
+#include <QUndoStack>
 
 namespace totcad {
 
-GInstanceTreeModel::GInstanceTreeModel(GAnnotationDocument *document, QObject *parent)
-    : QAbstractItemModel(parent), m_document(document)
+GInstanceTreeModel::GInstanceTreeModel(GAnnotationDocument *document, QUndoStack *undoStack, QObject *parent)
+    : QAbstractItemModel(parent), m_document(document), m_undoStack(undoStack)
 {
     const auto refresh = [this] { beginResetModel(); endResetModel(); };
     connect(document, &GAnnotationDocument::instancesChanged, this, refresh);
@@ -67,7 +70,13 @@ Qt::ItemFlags GInstanceTreeModel::flags(const QModelIndex &indexValue) const
 
 bool GInstanceTreeModel::setData(const QModelIndex &indexValue, const QVariant &value, int role)
 {
-    return role == Qt::EditRole && m_document->setInstanceName(instanceId(indexValue), value.toString());
+    if (role != Qt::EditRole || value.toString().trimmed().isEmpty())
+        return false;
+    const QString id = instanceId(indexValue);
+    if (id.isEmpty())
+        return false;
+    m_undoStack->push(new GRenameInstanceCommand(m_document, id, value.toString()));
+    return true;
 }
 
 void GInstanceTreeModel::setCurrentType(const QString &typeId)

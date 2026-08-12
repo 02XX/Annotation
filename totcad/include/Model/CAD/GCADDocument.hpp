@@ -19,6 +19,7 @@ public:
     explicit GCADDocument(QObject *parent = nullptr);
 
     void clear();
+    void replaceWith(GCADDocument &other);
     void addEntity(std::shared_ptr<GCADEntity> entity);
     void addLayer(GCADLayer layer);
     void addLineType(GCADLineType lineType);

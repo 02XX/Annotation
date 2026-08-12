@@ -61,8 +61,8 @@ void GMainWindow::createWorkspace()
     m_selectionController = new GSelectionController(m_cadScene, this);
     m_toolController = new GToolController(m_cadView, this);
 
-    m_typeModel = new GTypeTableModel(m_annotationDocument, this);
-    m_instanceModel = new GInstanceTreeModel(m_annotationDocument, this);
+    m_typeModel = new GTypeTableModel(m_annotationDocument, m_undoStack, this);
+    m_instanceModel = new GInstanceTreeModel(m_annotationDocument, m_undoStack, this);
     m_layerModel = new GLayerTableModel(this);
 
     m_typeDock = new GTypeDockWidget(this);
@@ -98,7 +98,7 @@ void GMainWindow::createActions()
     m_undoAction = m_undoStack->createUndoAction(this, tr("撤销"));
     m_undoAction->setShortcut(QKeySequence::Undo);
     m_redoAction = m_undoStack->createRedoAction(this, tr("重复"));
-    m_redoAction->setShortcut(QKeySequence::Redo);
+    m_redoAction->setShortcuts({QKeySequence::Redo, QKeySequence(Qt::CTRL | Qt::Key_Y)});
     m_typeAnnotationAction = new QAction(tr("类型标注"), this);
     m_typeAnnotationAction->setCheckable(true);
     m_instanceAnnotationAction = new QAction(tr("实例标注"), this);
@@ -144,6 +144,10 @@ void GMainWindow::createMenusAndToolbars()
     visibilityMenu->addAction(m_typeDock->toggleViewAction());
     visibilityMenu->addAction(m_instanceDock->toggleViewAction());
     visibilityMenu->addAction(m_layerDock->toggleViewAction());
+    QAction *statusBarAction = visibilityMenu->addAction(tr("状态栏"));
+    statusBarAction->setCheckable(true);
+    statusBarAction->setChecked(true);
+    connect(statusBarAction, &QAction::toggled, statusBar(), &QStatusBar::setVisible);
     viewMenu->addSeparator();
     viewMenu->addAction(m_showAllAction);
     viewMenu->addAction(m_realtimeZoomAction);

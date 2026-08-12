@@ -1,13 +1,15 @@
 #include "Model/GTypeTableModel.hpp"
 
+#include "Command/Type/GRenameTypeCommand.hpp"
 #include "Model/Annotation/GAnnotationDocument.hpp"
 
 #include <QBrush>
+#include <QUndoStack>
 
 namespace totcad {
 
-GTypeTableModel::GTypeTableModel(GAnnotationDocument *document, QObject *parent)
-    : QAbstractTableModel(parent), m_document(document)
+GTypeTableModel::GTypeTableModel(GAnnotationDocument *document, QUndoStack *undoStack, QObject *parent)
+    : QAbstractTableModel(parent), m_document(document), m_undoStack(undoStack)
 {
     const auto refresh = [this] { beginResetModel(); endResetModel(); };
     connect(document, &GAnnotationDocument::typesChanged, this, refresh);
@@ -57,7 +59,10 @@ bool GTypeTableModel::setData(const QModelIndex &index, const QVariant &value, i
 {
     if (role != Qt::EditRole || !index.isValid() || index.column() != 0)
         return false;
-    return m_document->setTypeName(typeId(index.row()), value.toString());
+    if (value.toString().trimmed().isEmpty())
+        return false;
+    m_undoStack->push(new GRenameTypeCommand(m_document, typeId(index.row()), value.toString()));
+    return true;
 }
 
 QString GTypeTableModel::typeId(int row) const

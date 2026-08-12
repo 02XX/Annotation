@@ -20,20 +20,28 @@ GDocumentController::GDocumentController(GCADDocument *cadDocument,
       m_annotationDocument(annotationDocument),
       m_undoStack(undoStack)
 {
+    connect(m_undoStack, &QUndoStack::cleanChanged, this, [this](bool clean) {
+        if (clean)
+            m_annotationDocument->setClean();
+    });
 }
 
 bool GDocumentController::open(const QString &filePath, QString *errorMessage)
 {
-    if (!GDXFParser{}.parseFile(filePath, *m_cadDocument, errorMessage))
+    GCADDocument parsedCadDocument;
+    if (!GDXFParser{}.parseFile(filePath, parsedCadDocument, errorMessage))
         return false;
 
-    m_annotationDocument->clear();
-    const QString annotationPath = annotationFilePath();
+    const QFileInfo dxfInfo(filePath);
+    const QString annotationPath = dxfInfo.absolutePath() + QLatin1Char('/')
+                                   + dxfInfo.completeBaseName() + QStringLiteral(".json");
+    GAnnotationDocument parsedAnnotationDocument;
     if (QFileInfo::exists(annotationPath)
-        && !GAnnotationSerializer{}.load(annotationPath, *m_annotationDocument, errorMessage)) {
-        m_cadDocument->clear();
+        && !GAnnotationSerializer{}.load(annotationPath, parsedAnnotationDocument, errorMessage)) {
         return false;
     }
+    m_cadDocument->replaceWith(parsedCadDocument);
+    m_annotationDocument->restore(parsedAnnotationDocument.snapshot(), false);
     m_annotationDocument->setClean();
     m_undoStack->clear();
     m_undoStack->setClean();

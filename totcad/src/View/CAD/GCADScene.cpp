@@ -47,6 +47,30 @@ double positiveSweep(double start, double end)
         result += 360.0;
     return result;
 }
+
+void appendBulgedSegment(QPainterPath &path, const QPointF &start, const QPointF &end, double bulge)
+{
+    if (qAbs(bulge) < 1.0e-9) {
+        path.lineTo(scenePoint(end));
+        return;
+    }
+    const double chord = QLineF(start, end).length();
+    if (chord < 1.0e-9)
+        return;
+    const QPointF midpoint = (start + end) / 2.0;
+    const QPointF direction = (end - start) / chord;
+    const QPointF leftNormal(-direction.y(), direction.x());
+    const double centerDistance = chord * (1.0 - bulge * bulge) / (4.0 * bulge);
+    const QPointF center = midpoint + leftNormal * centerDistance;
+    const double radius = QLineF(center, start).length();
+    const double startAngle = qAtan2(start.y() - center.y(), start.x() - center.x());
+    const double sweep = 4.0 * qAtan(bulge);
+    const int segments = qMax(4, static_cast<int>(qCeil(qAbs(sweep) / (M_PI / 18.0))));
+    for (int step = 1; step <= segments; ++step) {
+        const double angle = startAngle + sweep * static_cast<double>(step) / static_cast<double>(segments);
+        path.lineTo(scenePoint(center + QPointF(qCos(angle) * radius, qSin(angle) * radius)));
+    }
+}
 }
 
 GCADScene::GCADScene(QObject *parent) : QGraphicsScene(parent)
@@ -154,10 +178,17 @@ void GCADScene::addEntity(const std::shared_ptr<GCADEntity> &entity,
         const auto value = std::static_pointer_cast<GCADPolyline>(entity);
         if (!value->vertices.isEmpty()) {
             path.moveTo(scenePoint(value->vertices.first()));
-            for (int i = 1; i < value->vertices.size(); ++i)
-                path.lineTo(scenePoint(value->vertices.at(i)));
-            if (value->closed)
+            for (int i = 1; i < value->vertices.size(); ++i) {
+                const double bulge = i - 1 < value->bulges.size() ? value->bulges.at(i - 1) : 0.0;
+                appendBulgedSegment(path, value->vertices.at(i - 1), value->vertices.at(i), bulge);
+            }
+            if (value->closed) {
+                const double bulge = value->vertices.size() - 1 < value->bulges.size()
+                                           ? value->bulges.at(value->vertices.size() - 1)
+                                           : 0.0;
+                appendBulgedSegment(path, value->vertices.last(), value->vertices.first(), bulge);
                 path.closeSubpath();
+            }
         }
         break;
     }
@@ -206,7 +237,7 @@ void GCADScene::addEntity(const std::shared_ptr<GCADEntity> &entity,
         return;
     auto *item = new GCADEntityItem(selectionId, entity->layerName, path);
     const QColor color = entityColor(*entity, selectionId);
-    item->setBaseStyle(QPen(color, 0.0), filled ? QBrush(color) : Qt::NoBrush);
+    item->setBaseStyle(entityPen(*entity, selectionId), filled ? QBrush(color) : Qt::NoBrush);
     item->setTransform(transform);
     addItem(item);
     m_entityItems[selectionId].append(item);
@@ -231,19 +262,38 @@ QColor GCADScene::entityColor(const GCADEntity &entity, const QString &selection
     return Qt::white;
 }
 
+QPen GCADScene::entityPen(const GCADEntity &entity, const QString &selectionId) const
+{
+    QString lineTypeName = entity.lineTypeName;
+    double lineWidth = 0.0;
+    if (m_cadDocument) {
+        const auto layer = m_cadDocument->layers().constFind(entity.layerName);
+        if (layer != m_cadDocument->layers().cend()) {
+            if (lineTypeName.compare(QStringLiteral("BYLAYER"), Qt::CaseInsensitive) == 0)
+                lineTypeName = layer->lineTypeName;
+            lineWidth = layer->lineWidth;
+        }
+    }
+    QPen pen(entityColor(entity, selectionId), lineWidth > 0.0 ? qMax(1.0, lineWidth * 2.0) : 0.0);
+    pen.setCosmetic(true);
+    if (m_cadDocument) {
+        const auto lineType = m_cadDocument->lineTypes().constFind(lineTypeName);
+        if (lineType != m_cadDocument->lineTypes().cend() && !lineType->pattern.isEmpty()) {
+            QVector<qreal> dashPattern;
+            for (double element : lineType->pattern)
+                dashPattern.append(qMax(0.5, qAbs(element)));
+            if (dashPattern.size() % 2 != 0)
+                dashPattern += dashPattern;
+            pen.setStyle(Qt::CustomDashLine);
+            pen.setDashPattern(dashPattern);
+        }
+    }
+    return pen;
+}
+
 void GCADScene::refreshStyles()
 {
-    if (!m_cadDocument)
-        return;
-    for (auto it = m_entityItems.begin(); it != m_entityItems.end(); ++it) {
-        const auto entity = m_cadDocument->entity(it.key());
-        if (!entity)
-            continue;
-        const QColor color = entityColor(*entity, it.key());
-        for (GCADEntityItem *item : it.value())
-            item->setBaseStyle(QPen(color, 0.0), item->brush().style() == Qt::NoBrush ? Qt::NoBrush : QBrush(color));
-    }
-    refreshInstanceBoxes();
+    rebuild();
 }
 
 QRectF GCADScene::instanceBounds(const QString &instanceId) const

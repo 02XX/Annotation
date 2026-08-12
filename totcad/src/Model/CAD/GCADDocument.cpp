@@ -22,6 +22,18 @@ void GCADDocument::clear()
     addLineType(GCADLineType{});
 }
 
+void GCADDocument::replaceWith(GCADDocument &other)
+{
+    m_entities = std::move(other.m_entities);
+    m_entityById = std::move(other.m_entityById);
+    m_layers = std::move(other.m_layers);
+    m_lineTypes = std::move(other.m_lineTypes);
+    m_blocks = std::move(other.m_blocks);
+    modelSpace = std::move(other.modelSpace);
+    paperSpace = std::move(other.paperSpace);
+    sourcePath = std::move(other.sourcePath);
+}
+
 void GCADDocument::addEntity(std::shared_ptr<GCADEntity> entity)
 {
     if (!entity)
