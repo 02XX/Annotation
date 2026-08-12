@@ -11,6 +11,20 @@ template <typename TKey> class IEntity
   public:
     virtual ~IEntity() = default;
 };
+template <typename TKey> class Entity : public IEntity<TKey>
+{
+  private:
+    TKey m_id{};
+
+  public:
+    const TKey &id() const;
+    void setId();
+};
+using EntityID = uint64_t;
+class GEntity : public Entity<EntityID>
+{
+  public:
+};
 
 enum class GCADEntityType
 {
