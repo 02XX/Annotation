@@ -1,9 +1,12 @@
 #include "Command/Assignment/GAssignInstanceCommand.hpp"
 #include "Command/Type/GDeleteTypeCommand.hpp"
-#include "Model/Annotation/GAnnotationDocument.hpp"
+#include "Model/GAnnotationModel.hpp"
+#include "Model/GDXFModel.hpp"
+#include "Model/Entities/GLineEntity.hpp"
 
 #include <QUndoStack>
 #include <gtest/gtest.h>
+#include <memory>
 
 namespace {
 
@@ -17,9 +20,27 @@ TEST(GEntityTest, StoresTypedEntityId)
     EXPECT_EQ(entity.id(), 42U);
 }
 
-TEST(GAnnotationDocumentTest, EnforcesTypeAndInstanceRelations)
+TEST(GModelTest, DrawingAndAnnotationsHaveIndependentLifecycles)
 {
-    totcad::GAnnotationDocument document;
+    totcad::GDXFModel drawing;
+    totcad::GAnnotationModel annotations;
+    EXPECT_TRUE(drawing.isEmpty());
+    EXPECT_TRUE(annotations.isEmpty());
+
+    drawing.addEntity(std::make_shared<totcad::GLineEntity>(1));
+    annotations.addType(QStringLiteral("门"), Qt::red);
+    EXPECT_FALSE(drawing.isEmpty());
+    EXPECT_FALSE(annotations.isEmpty());
+
+    drawing.clear();
+    annotations.clear();
+    EXPECT_TRUE(drawing.isEmpty());
+    EXPECT_TRUE(annotations.isEmpty());
+}
+
+TEST(GAnnotationModelTest, EnforcesTypeAndInstanceRelations)
+{
+    totcad::GAnnotationModel document;
     const QString firstType = document.addType(QStringLiteral("门"), Qt::red);
     const QString secondType = document.addType(QStringLiteral("窗"), Qt::blue);
     const QString instance = document.addInstance(firstType, QStringLiteral("门1"));
@@ -37,7 +58,7 @@ TEST(GAnnotationDocumentTest, EnforcesTypeAndInstanceRelations)
 
 TEST(GAnnotationCommandTest, RestoresCascadeDeletion)
 {
-    totcad::GAnnotationDocument document;
+    totcad::GAnnotationModel document;
     const QString type = document.addType(QStringLiteral("桌子"), Qt::green);
     const QString instance = document.addInstance(type, QStringLiteral("桌子1"));
     document.assignInstance({0xAB}, instance);

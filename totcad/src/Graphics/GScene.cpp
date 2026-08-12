@@ -11,11 +11,11 @@
 #include "Graphics/GPointItem.hpp"
 #include "Graphics/GPolylineItem.hpp"
 #include "Graphics/GTextItem.hpp"
-#include "Model/Annotation/GAnnotationDocument.hpp"
+#include "Model/GAnnotationModel.hpp"
 #include "Model/Entities/GArcEntity.hpp"
 #include "Model/Entities/GCircleEntity.hpp"
 #include "Model/Entities/GDimensionEntity.hpp"
-#include "Model/Entities/GDocumentEntity.hpp"
+#include "Model/GDXFModel.hpp"
 #include "Model/Entities/GHatchEntity.hpp"
 #include "Model/Entities/GInsertEntity.hpp"
 #include "Model/Entities/GLineEntity.hpp"
@@ -44,6 +44,7 @@ QColor aciColor(int colorIndex)
     default: return QColor::fromHsv(((qAbs(colorIndex) - 10) * 17) % 360, 180, 230);
     }
 }
+
 }
 
 GScene::GScene(QObject *parent) : QGraphicsScene(parent)
@@ -51,20 +52,22 @@ GScene::GScene(QObject *parent) : QGraphicsScene(parent)
     setBackgroundBrush(QColor(25, 27, 31));
 }
 
-void GScene::setDocuments(GDocumentEntity *document, GAnnotationDocument *annotationDocument)
+void GScene::setDocuments(GDXFModel *document, GAnnotationModel *annotationDocument)
 {
     m_document = document;
     m_annotationDocument = annotationDocument;
     if (m_document) {
-        connect(m_document, &GDocumentEntity::layerVisibilityChanged,
+        connect(m_document, &GDXFModel::layerVisibilityChanged,
+                this, &GScene::rebuild, Qt::UniqueConnection);
+        connect(m_document, &GDXFModel::modelReset,
                 this, &GScene::rebuild, Qt::UniqueConnection);
     }
     if (m_annotationDocument) {
-        connect(m_annotationDocument, &GAnnotationDocument::assignmentsChanged,
+        connect(m_annotationDocument, &GAnnotationModel::assignmentsChanged,
                 this, &GScene::refreshStyles, Qt::UniqueConnection);
-        connect(m_annotationDocument, &GAnnotationDocument::instancesChanged,
+        connect(m_annotationDocument, &GAnnotationModel::instancesChanged,
                 this, &GScene::refreshInstanceBoxes, Qt::UniqueConnection);
-        connect(m_annotationDocument, &GAnnotationDocument::documentReset,
+        connect(m_annotationDocument, &GAnnotationModel::annotationReset,
                 this, &GScene::refreshStyles, Qt::UniqueConnection);
     }
     rebuild();
@@ -95,8 +98,8 @@ void GScene::addEntity(const std::shared_ptr<GEntity> &entity,
 {
     if (!entity || insertionDepth > 16)
         return;
-    const auto layerIt = m_document->layers().constFind(entity->layerName);
-    if (layerIt != m_document->layers().cend() && !layerIt->visible)
+    const auto layerIt = m_document->layers().find(entity->layerName.toStdString());
+    if (layerIt != m_document->layers().end() && !layerIt->second.visible)
         return;
 
     if (const auto insert = std::dynamic_pointer_cast<GInsertEntity>(entity)) {
@@ -105,7 +108,7 @@ void GScene::addEntity(const std::shared_ptr<GEntity> &entity,
         insertItem->setTransform(transform);
         addItem(insertItem);
 
-        const GBlockEntity *block = m_document->block(insert->blockName);
+        const GBlockEntity *block = m_document->block(insert->blockName.toStdString());
         if (!block)
             return;
         QTransform insertion;
@@ -169,9 +172,9 @@ QColor GScene::entityColor(const GEntity &entity, EntityID selectionId) const
     if (entity.colorIndex > 0 && entity.colorIndex < 256)
         return aciColor(entity.colorIndex);
     if (m_document) {
-        const auto it = m_document->layers().constFind(entity.layerName);
-        if (it != m_document->layers().cend())
-            return it->color;
+        const auto it = m_document->layers().find(entity.layerName.toStdString());
+        if (it != m_document->layers().end())
+            return aciColor(it->second.colorIndex);
     }
     return Qt::white;
 }
@@ -181,20 +184,20 @@ QPen GScene::entityPen(const GEntity &entity, EntityID selectionId) const
     QString lineTypeName = entity.lineTypeName;
     double lineWidth = 0.0;
     if (m_document) {
-        const auto layer = m_document->layers().constFind(entity.layerName);
-        if (layer != m_document->layers().cend()) {
+        const auto layer = m_document->layers().find(entity.layerName.toStdString());
+        if (layer != m_document->layers().end()) {
             if (lineTypeName.compare(QStringLiteral("BYLAYER"), Qt::CaseInsensitive) == 0)
-                lineTypeName = layer->lineTypeName;
-            lineWidth = layer->lineWidth;
+                lineTypeName = layer->second.lineTypeName;
+            lineWidth = layer->second.lineWidth;
         }
     }
     QPen pen(entityColor(entity, selectionId), lineWidth > 0.0 ? qMax(1.0, lineWidth * 2.0) : 0.0);
     pen.setCosmetic(true);
     if (m_document) {
-        const auto lineType = m_document->lineTypes().constFind(lineTypeName);
-        if (lineType != m_document->lineTypes().cend() && !lineType->pattern.isEmpty()) {
+        const auto lineType = m_document->lineTypes().find(lineTypeName.toStdString());
+        if (lineType != m_document->lineTypes().end() && !lineType->second.pattern.isEmpty()) {
             QVector<qreal> dashPattern;
-            for (double element : lineType->pattern)
+            for (double element : lineType->second.pattern)
                 dashPattern.append(qMax(0.5, qAbs(element)));
             if (dashPattern.size() % 2 != 0)
                 dashPattern += dashPattern;

@@ -16,11 +16,11 @@ struct GAnnotationSnapshot {
     QHash<EntityID, QString> entityInstances;
 };
 
-class GAnnotationDocument final : public QObject
+class GAnnotationModel final : public QObject
 {
     Q_OBJECT
 public:
-    explicit GAnnotationDocument(QObject *parent = nullptr);
+    explicit GAnnotationModel(QObject *parent = nullptr);
 
     const QVector<GAnnotationType> &types() const noexcept { return m_types; }
     const QVector<GAnnotationInstance> &instances() const noexcept { return m_instances; }
@@ -54,11 +54,12 @@ public:
     GAnnotationSnapshot snapshot() const;
     void restore(const GAnnotationSnapshot &snapshot, bool markDirty = true);
     void clear();
+    bool isEmpty() const noexcept;
     bool isDirty() const noexcept { return m_dirty; }
     void setClean();
 
 signals:
-    void documentReset();
+    void annotationReset();
     void typesChanged();
     void instancesChanged();
     void assignmentsChanged();

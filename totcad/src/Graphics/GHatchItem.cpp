@@ -26,7 +26,7 @@ QPainterPath GHatchItem::entityPath() const
     if (!m_entity)
         return path;
     path.setFillRule(Qt::OddEvenFill);
-    for (const QPolygonF &boundary : m_entity->boundaries) {
+    for (const auto &boundary : m_entity->boundaries) {
         QPolygonF mapped;
         for (const QPointF &point : boundary)
             mapped.append(QPointF(point.x(), -point.y()));

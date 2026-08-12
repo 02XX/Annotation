@@ -1,12 +1,12 @@
 #include "View/Main/GMainWindow.hpp"
 
 #include "Controller/GAnnotationController.hpp"
-#include "Controller/GDocumentController.hpp"
+#include "Controller/GFileController.hpp"
 #include "Controller/GSelectionController.hpp"
 #include "Controller/GToolController.hpp"
 #include "IO/GRecentFileManager.hpp"
-#include "Model/Annotation/GAnnotationDocument.hpp"
-#include "Model/Entities/GDocumentEntity.hpp"
+#include "Model/GAnnotationModel.hpp"
+#include "Model/GDXFModel.hpp"
 #include "Model/GInstanceTreeModel.hpp"
 #include "Model/GLayerTableModel.hpp"
 #include "Model/GTypeTableModel.hpp"
@@ -49,15 +49,15 @@ GMainWindow::GMainWindow(QWidget *parent) : QMainWindow(parent)
 
 void GMainWindow::createWorkspace()
 {
-    m_cadDocument = new GDocumentEntity(this);
-    m_annotationDocument = new GAnnotationDocument(this);
+    m_cadDocument = new GDXFModel(this);
+    m_annotationDocument = new GAnnotationModel(this);
     m_undoStack = new QUndoStack(this);
     m_cadScene = new GScene(this);
     m_cadScene->setDocuments(m_cadDocument, m_annotationDocument);
     m_cadView = new GView(m_cadScene, this);
     setCentralWidget(m_cadView);
 
-    m_documentController = new GDocumentController(m_cadDocument, m_annotationDocument, m_undoStack, this);
+    m_fileController = new GFileController(m_cadDocument, m_annotationDocument, m_undoStack, this);
     m_annotationController = new GAnnotationController(m_annotationDocument, m_undoStack, this);
     m_selectionController = new GSelectionController(m_cadScene, this);
     m_toolController = new GToolController(m_cadView, this);
@@ -288,10 +288,10 @@ void GMainWindow::connectWorkspace()
         m_coordinateLabel->setText(tr("X: %1  Y: %2").arg(point.x(), 0, 'f', 2).arg(-point.y(), 0, 'f', 2));
     });
     const auto refresh = [this] { updateStatus(); updateActionStates(); updateWindowTitle(); };
-    connect(m_annotationDocument, &GAnnotationDocument::typesChanged, this, refresh);
-    connect(m_annotationDocument, &GAnnotationDocument::instancesChanged, this, refresh);
-    connect(m_annotationDocument, &GAnnotationDocument::assignmentsChanged, this, refresh);
-    connect(m_annotationDocument, &GAnnotationDocument::dirtyChanged, this, refresh);
+    connect(m_annotationDocument, &GAnnotationModel::typesChanged, this, refresh);
+    connect(m_annotationDocument, &GAnnotationModel::instancesChanged, this, refresh);
+    connect(m_annotationDocument, &GAnnotationModel::assignmentsChanged, this, refresh);
+    connect(m_annotationDocument, &GAnnotationModel::dirtyChanged, this, refresh);
     connect(m_undoStack, &QUndoStack::cleanChanged, this, [this] { updateActionStates(); updateWindowTitle(); });
 }
 
@@ -300,12 +300,12 @@ bool GMainWindow::openFile(const QString &filePath)
     if (!confirmSaveIfModified())
         return false;
     QString error;
-    if (!m_documentController->open(filePath, &error)) {
+    if (!m_fileController->open(filePath, &error)) {
         QMessageBox::critical(this, tr("打开失败"), error);
         updateRecentFiles();
         return false;
     }
-    m_layerModel->setDocument(m_cadDocument);
+    m_layerModel->setDrawing(m_cadDocument);
     m_cadScene->rebuild();
     m_cadView->showAll();
     updateRecentFiles();
@@ -318,8 +318,8 @@ bool GMainWindow::openFile(const QString &filePath)
 bool GMainWindow::saveDocument()
 {
     QString error;
-    if (m_documentController->save(&error)) {
-        statusBar()->showMessage(tr("已保存：%1").arg(m_documentController->annotationFilePath()), 4000);
+    if (m_fileController->save(&error)) {
+        statusBar()->showMessage(tr("已保存：%1").arg(m_fileController->annotationFilePath()), 4000);
         updateActionStates();
         updateWindowTitle();
         return true;
@@ -330,7 +330,7 @@ bool GMainWindow::saveDocument()
 
 bool GMainWindow::confirmSaveIfModified()
 {
-    if (!m_documentController->isModified())
+    if (!m_fileController->isModified())
         return true;
     const auto result = QMessageBox::warning(this, tr("未保存的标注"),
                                              tr("当前标注已修改，是否保存？"),
@@ -346,8 +346,8 @@ void GMainWindow::closeDocument()
     if (!confirmSaveIfModified())
         return;
     m_toolController->activate(GToolController::Mode::Select);
-    m_documentController->close();
-    m_layerModel->setDocument(nullptr);
+    m_fileController->close();
+    m_layerModel->setDrawing(nullptr);
     m_cadScene->rebuild();
     m_instanceModel->setCurrentType({});
     updateStatus();
@@ -381,8 +381,9 @@ void GMainWindow::updateRecentFiles()
 
 void GMainWindow::updateStatus()
 {
-    const bool open = m_documentController->hasDocument();
-    m_pathLabel->setText(open ? m_cadDocument->sourcePath : tr("未打开文件"));
+    const bool open = m_fileController->hasDrawing();
+    m_pathLabel->setText(open ? QString::fromUtf8(m_cadDocument->sourcePath().c_str())
+                              : tr("未打开文件"));
     m_entityCountLabel->setText(tr("实体：%1").arg(open ? m_cadDocument->entityCount() : 0));
     m_typeCountLabel->setText(tr("类型标注：%1").arg(m_annotationDocument->assignedTypeEntityCount()));
     m_instanceCountLabel->setText(tr("实例标注：%1").arg(m_annotationDocument->assignedInstanceEntityCount()));
@@ -390,8 +391,8 @@ void GMainWindow::updateStatus()
 
 void GMainWindow::updateActionStates()
 {
-    const bool open = m_documentController->hasDocument();
-    m_saveAction->setEnabled(open && m_documentController->isModified());
+    const bool open = m_fileController->hasDrawing();
+    m_saveAction->setEnabled(open && m_fileController->isModified());
     m_closeAction->setEnabled(open);
     m_typeAnnotationAction->setEnabled(open);
     m_instanceAnnotationAction->setEnabled(open);
@@ -404,10 +405,11 @@ void GMainWindow::updateActionStates()
 void GMainWindow::updateWindowTitle()
 {
     QString title = tr("矢量图 AI 标注工具");
-    if (m_documentController->hasDocument())
+    if (m_fileController->hasDrawing())
         title = QStringLiteral("%1%2 — %3")
-                    .arg(m_documentController->isModified() ? QStringLiteral("*") : QString{},
-                         QFileInfo(m_cadDocument->sourcePath).fileName(), title);
+                    .arg(m_fileController->isModified() ? QStringLiteral("*") : QString{},
+                         QFileInfo(QString::fromUtf8(m_cadDocument->sourcePath().c_str())).fileName(),
+                         title);
     setWindowTitle(title);
 }
 

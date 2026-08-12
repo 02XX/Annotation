@@ -1,19 +1,19 @@
 #include "Model/GTypeTableModel.hpp"
 
 #include "Command/Type/GRenameTypeCommand.hpp"
-#include "Model/Annotation/GAnnotationDocument.hpp"
+#include "Model/GAnnotationModel.hpp"
 
 #include <QBrush>
 #include <QUndoStack>
 
 namespace totcad {
 
-GTypeTableModel::GTypeTableModel(GAnnotationDocument *document, QUndoStack *undoStack, QObject *parent)
+GTypeTableModel::GTypeTableModel(GAnnotationModel *document, QUndoStack *undoStack, QObject *parent)
     : QAbstractTableModel(parent), m_document(document), m_undoStack(undoStack)
 {
     const auto refresh = [this] { beginResetModel(); endResetModel(); };
-    connect(document, &GAnnotationDocument::typesChanged, this, refresh);
-    connect(document, &GAnnotationDocument::assignmentsChanged, this, refresh);
+    connect(document, &GAnnotationModel::typesChanged, this, refresh);
+    connect(document, &GAnnotationModel::assignmentsChanged, this, refresh);
 }
 
 int GTypeTableModel::rowCount(const QModelIndex &parent) const { return parent.isValid() ? 0 : m_document->types().size(); }

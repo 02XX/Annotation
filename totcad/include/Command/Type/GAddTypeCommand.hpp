@@ -7,7 +7,7 @@ namespace totcad {
 class GAddTypeCommand final : public GAnnotationCommand
 {
 public:
-    explicit GAddTypeCommand(GAnnotationDocument *document);
+    explicit GAddTypeCommand(GAnnotationModel *document);
     QString createdId() const { return m_createdId; }
 protected:
     void apply() override;

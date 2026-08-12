@@ -3,23 +3,26 @@
 class QAction;
 class QModelIndex;
 class QTableView;
-namespace totcad {
+namespace totcad
+{
 class GTypeTableModel;
-class GTypeDockWidget final : public QDockWidget {
+class GTypeDockWidget final : public QDockWidget
+{
     Q_OBJECT
-public:
+  public:
     explicit GTypeDockWidget(QWidget *parent = nullptr);
     void setModel(GTypeTableModel *model);
     QString currentTypeId() const;
     int currentRow() const;
     void selectRow(int row);
-signals:
+  signals:
     void addRequested();
     void deleteRequested(const QString &typeId);
     void moveRequested(const QString &typeId, int offset);
     void colorRequested(const QString &typeId);
     void currentTypeChanged(const QString &typeId);
-private:
+
+  private:
     void updateActions();
     GTypeTableModel *m_model{nullptr};
     QTableView *m_table{nullptr};

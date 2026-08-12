@@ -10,13 +10,13 @@ class QUndoStack;
 
 namespace totcad {
 
-class GAnnotationDocument;
+class GAnnotationModel;
 
 class GAnnotationController final : public QObject
 {
     Q_OBJECT
 public:
-    GAnnotationController(GAnnotationDocument *document, QUndoStack *undoStack, QObject *parent = nullptr);
+    GAnnotationController(GAnnotationModel *document, QUndoStack *undoStack, QObject *parent = nullptr);
 
     void addType();
     void deleteType(const QString &typeId);
@@ -28,7 +28,7 @@ public:
     void assignInstance(const QVector<EntityID> &entityIds, const QString &instanceId);
 
 private:
-    GAnnotationDocument *m_document;
+    GAnnotationModel *m_document;
     QUndoStack *m_undoStack;
 };
 

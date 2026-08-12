@@ -1,4 +1,4 @@
-#include "Model/Annotation/GAnnotationDocument.hpp"
+#include "Model/GAnnotationModel.hpp"
 
 #include <QUuid>
 
@@ -11,9 +11,9 @@ QString newId()
 }
 }
 
-GAnnotationDocument::GAnnotationDocument(QObject *parent) : QObject(parent) {}
+GAnnotationModel::GAnnotationModel(QObject *parent) : QObject(parent) {}
 
-int GAnnotationDocument::typeIndex(const QString &id) const
+int GAnnotationModel::typeIndex(const QString &id) const
 {
     for (int i = 0; i < m_types.size(); ++i)
         if (m_types.at(i).id == id)
@@ -21,7 +21,7 @@ int GAnnotationDocument::typeIndex(const QString &id) const
     return -1;
 }
 
-int GAnnotationDocument::instanceIndex(const QString &id) const
+int GAnnotationModel::instanceIndex(const QString &id) const
 {
     for (int i = 0; i < m_instances.size(); ++i)
         if (m_instances.at(i).id == id)
@@ -29,19 +29,19 @@ int GAnnotationDocument::instanceIndex(const QString &id) const
     return -1;
 }
 
-const GAnnotationType *GAnnotationDocument::type(const QString &id) const
+const GAnnotationType *GAnnotationModel::type(const QString &id) const
 {
     const int index = typeIndex(id);
     return index < 0 ? nullptr : &m_types.at(index);
 }
 
-const GAnnotationInstance *GAnnotationDocument::instance(const QString &id) const
+const GAnnotationInstance *GAnnotationModel::instance(const QString &id) const
 {
     const int index = instanceIndex(id);
     return index < 0 ? nullptr : &m_instances.at(index);
 }
 
-QVector<GAnnotationInstance> GAnnotationDocument::instancesForType(const QString &typeId) const
+QVector<GAnnotationInstance> GAnnotationModel::instancesForType(const QString &typeId) const
 {
     QVector<GAnnotationInstance> result;
     for (const auto &value : m_instances)
@@ -50,7 +50,7 @@ QVector<GAnnotationInstance> GAnnotationDocument::instancesForType(const QString
     return result;
 }
 
-int GAnnotationDocument::assignedTypeEntityCount(const QString &typeId) const
+int GAnnotationModel::assignedTypeEntityCount(const QString &typeId) const
 {
     if (typeId.isEmpty())
         return m_entityTypes.size();
@@ -60,7 +60,7 @@ int GAnnotationDocument::assignedTypeEntityCount(const QString &typeId) const
     return count;
 }
 
-int GAnnotationDocument::assignedInstanceEntityCount(const QString &instanceId) const
+int GAnnotationModel::assignedInstanceEntityCount(const QString &instanceId) const
 {
     if (instanceId.isEmpty())
         return m_entityInstances.size();
@@ -68,7 +68,7 @@ int GAnnotationDocument::assignedInstanceEntityCount(const QString &instanceId) 
     return value ? value->entityIds.size() : 0;
 }
 
-QString GAnnotationDocument::addType(QString name, QColor color)
+QString GAnnotationModel::addType(QString name, QColor color)
 {
     GAnnotationType value;
     value.id = newId();
@@ -78,7 +78,7 @@ QString GAnnotationDocument::addType(QString name, QColor color)
     return value.id;
 }
 
-void GAnnotationDocument::insertType(int index, GAnnotationType typeValue)
+void GAnnotationModel::insertType(int index, GAnnotationType typeValue)
 {
     if (typeValue.id.isEmpty())
         typeValue.id = newId();
@@ -88,7 +88,7 @@ void GAnnotationDocument::insertType(int index, GAnnotationType typeValue)
     emit typesChanged();
 }
 
-bool GAnnotationDocument::removeType(const QString &id)
+bool GAnnotationModel::removeType(const QString &id)
 {
     const int index = typeIndex(id);
     if (index < 0)
@@ -114,7 +114,7 @@ bool GAnnotationDocument::removeType(const QString &id)
     return true;
 }
 
-bool GAnnotationDocument::moveType(const QString &id, int offset)
+bool GAnnotationModel::moveType(const QString &id, int offset)
 {
     const int from = typeIndex(id);
     const int to = from + offset;
@@ -126,7 +126,7 @@ bool GAnnotationDocument::moveType(const QString &id, int offset)
     return true;
 }
 
-bool GAnnotationDocument::setTypeName(const QString &id, const QString &name)
+bool GAnnotationModel::setTypeName(const QString &id, const QString &name)
 {
     const int index = typeIndex(id);
     if (index < 0 || name.trimmed().isEmpty())
@@ -137,7 +137,7 @@ bool GAnnotationDocument::setTypeName(const QString &id, const QString &name)
     return true;
 }
 
-bool GAnnotationDocument::setTypeColor(const QString &id, const QColor &color)
+bool GAnnotationModel::setTypeColor(const QString &id, const QColor &color)
 {
     const int index = typeIndex(id);
     if (index < 0 || !color.isValid())
@@ -149,7 +149,7 @@ bool GAnnotationDocument::setTypeColor(const QString &id, const QColor &color)
     return true;
 }
 
-QString GAnnotationDocument::addInstance(const QString &typeId, QString name)
+QString GAnnotationModel::addInstance(const QString &typeId, QString name)
 {
     if (!type(typeId))
         return {};
@@ -162,7 +162,7 @@ QString GAnnotationDocument::addInstance(const QString &typeId, QString name)
     return value.id;
 }
 
-void GAnnotationDocument::insertInstance(int index, GAnnotationInstance value)
+void GAnnotationModel::insertInstance(int index, GAnnotationInstance value)
 {
     if (!type(value.typeId))
         return;
@@ -174,7 +174,7 @@ void GAnnotationDocument::insertInstance(int index, GAnnotationInstance value)
     emit instancesChanged();
 }
 
-bool GAnnotationDocument::removeInstance(const QString &id)
+bool GAnnotationModel::removeInstance(const QString &id)
 {
     const int index = instanceIndex(id);
     if (index < 0)
@@ -188,7 +188,7 @@ bool GAnnotationDocument::removeInstance(const QString &id)
     return true;
 }
 
-bool GAnnotationDocument::setInstanceName(const QString &id, const QString &name)
+bool GAnnotationModel::setInstanceName(const QString &id, const QString &name)
 {
     const int index = instanceIndex(id);
     if (index < 0 || name.trimmed().isEmpty())
@@ -199,7 +199,7 @@ bool GAnnotationDocument::setInstanceName(const QString &id, const QString &name
     return true;
 }
 
-void GAnnotationDocument::assignType(const QVector<EntityID> &entityIds, const QString &typeId)
+void GAnnotationModel::assignType(const QVector<EntityID> &entityIds, const QString &typeId)
 {
     if (!type(typeId) || entityIds.isEmpty())
         return;
@@ -218,7 +218,7 @@ void GAnnotationDocument::assignType(const QVector<EntityID> &entityIds, const Q
     emit assignmentsChanged();
 }
 
-void GAnnotationDocument::assignInstance(const QVector<EntityID> &entityIds, const QString &instanceId)
+void GAnnotationModel::assignInstance(const QVector<EntityID> &entityIds, const QString &instanceId)
 {
     const int targetIndex = instanceIndex(instanceId);
     if (targetIndex < 0 || entityIds.isEmpty())
@@ -238,7 +238,7 @@ void GAnnotationDocument::assignInstance(const QVector<EntityID> &entityIds, con
     emit assignmentsChanged();
 }
 
-void GAnnotationDocument::clearAssignments(const QVector<EntityID> &entityIds)
+void GAnnotationModel::clearAssignments(const QVector<EntityID> &entityIds)
 {
     for (EntityID entityId : entityIds) {
         const int index = instanceIndex(m_entityInstances.take(entityId));
@@ -251,12 +251,12 @@ void GAnnotationDocument::clearAssignments(const QVector<EntityID> &entityIds)
     emit assignmentsChanged();
 }
 
-GAnnotationSnapshot GAnnotationDocument::snapshot() const
+GAnnotationSnapshot GAnnotationModel::snapshot() const
 {
     return {m_types, m_instances, m_entityTypes, m_entityInstances};
 }
 
-void GAnnotationDocument::restore(const GAnnotationSnapshot &value, bool markDocumentDirty)
+void GAnnotationModel::restore(const GAnnotationSnapshot &value, bool markDocumentDirty)
 {
     m_types = value.types;
     m_instances = value.instances;
@@ -264,24 +264,30 @@ void GAnnotationDocument::restore(const GAnnotationSnapshot &value, bool markDoc
     m_entityInstances = value.entityInstances;
     if (markDocumentDirty)
         markDirty();
-    emit documentReset();
+    emit annotationReset();
     emit typesChanged();
     emit instancesChanged();
     emit assignmentsChanged();
 }
 
-void GAnnotationDocument::clear()
+void GAnnotationModel::clear()
 {
     m_types.clear();
     m_instances.clear();
     m_entityTypes.clear();
     m_entityInstances.clear();
     m_dirty = false;
-    emit documentReset();
+    emit annotationReset();
     emit dirtyChanged(false);
 }
 
-void GAnnotationDocument::setClean()
+bool GAnnotationModel::isEmpty() const noexcept
+{
+    return m_types.isEmpty() && m_instances.isEmpty()
+           && m_entityTypes.isEmpty() && m_entityInstances.isEmpty();
+}
+
+void GAnnotationModel::setClean()
 {
     if (!m_dirty)
         return;
@@ -289,7 +295,7 @@ void GAnnotationDocument::setClean()
     emit dirtyChanged(false);
 }
 
-void GAnnotationDocument::markDirty()
+void GAnnotationModel::markDirty()
 {
     if (m_dirty)
         return;

@@ -10,8 +10,8 @@
 
 namespace totcad {
 
-class GAnnotationDocument;
-class GDocumentEntity;
+class GAnnotationModel;
+class GDXFModel;
 class GEntityItem;
 class GInstanceBoxItem;
 
@@ -21,7 +21,7 @@ class GScene final : public QGraphicsScene
 public:
     explicit GScene(QObject *parent = nullptr);
 
-    void setDocuments(GDocumentEntity *document, GAnnotationDocument *annotationDocument);
+    void setDocuments(GDXFModel *document, GAnnotationModel *annotationDocument);
     void rebuild();
     void refreshStyles();
     void refreshInstanceBoxes();
@@ -36,8 +36,8 @@ private:
     QColor entityColor(const GEntity &entity, EntityID selectionId) const;
     QPen entityPen(const GEntity &entity, EntityID selectionId) const;
 
-    GDocumentEntity *m_document{nullptr};
-    GAnnotationDocument *m_annotationDocument{nullptr};
+    GDXFModel *m_document{nullptr};
+    GAnnotationModel *m_annotationDocument{nullptr};
     QHash<EntityID, QList<GEntityItem *>> m_entityItems;
     QHash<QString, GInstanceBoxItem *> m_instanceBoxes;
 };

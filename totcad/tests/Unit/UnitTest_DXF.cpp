@@ -1,37 +1,47 @@
-#include "DXF/GDXFParser.hpp"
-#include "Model/Entities/GCircleEntity.hpp"
-#include "Model/Entities/GDocumentEntity.hpp"
-#include "Model/Entities/GLineEntity.hpp"
+#include "DXF/Reader.hpp"
 
 #include <gtest/gtest.h>
 
+#include <sstream>
+
 namespace {
 
-TEST(GDXFParserTest, ParsesLayersAndBasicEntities)
+TEST(DXFReaderTest, ReadsSectionsTablesBlocksAndEntities)
 {
-    const QVector<totcad::GDXFGroup> groups{
-        {0, QStringLiteral("SECTION"), 1}, {2, QStringLiteral("TABLES"), 3},
-        {0, QStringLiteral("LAYER"), 5}, {2, QStringLiteral("WALL"), 7},
-        {62, QStringLiteral("1"), 9}, {6, QStringLiteral("CONTINUOUS"), 11},
-        {0, QStringLiteral("ENDSEC"), 13},
-        {0, QStringLiteral("SECTION"), 15}, {2, QStringLiteral("ENTITIES"), 17},
-        {0, QStringLiteral("LINE"), 19}, {5, QStringLiteral("A1"), 21},
-        {8, QStringLiteral("WALL"), 23}, {10, QStringLiteral("1"), 25},
-        {20, QStringLiteral("2"), 27}, {11, QStringLiteral("4"), 29},
-        {21, QStringLiteral("6"), 31},
-        {0, QStringLiteral("CIRCLE"), 33}, {5, QStringLiteral("A2"), 35},
-        {10, QStringLiteral("10"), 37}, {20, QStringLiteral("20"), 39},
-        {40, QStringLiteral("5"), 41}, {0, QStringLiteral("ENDSEC"), 43},
-        {0, QStringLiteral("EOF"), 45}
-    };
+    std::istringstream input{
+        "0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n"
+        "0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n70\n1\n"
+        "0\nLAYER\n2\nWALL\n62\n1\n6\nCONTINUOUS\n0\nENDTAB\n0\nENDSEC\n"
+        "0\nSECTION\n2\nBLOCKS\n0\nBLOCK\n2\nDOOR\n10\n0\n20\n0\n"
+        "0\nLINE\n10\n0\n20\n0\n11\n1\n21\n0\n0\nENDBLK\n0\nENDSEC\n"
+        "0\nSECTION\n2\nENTITIES\n0\nLINE\n5\nA1\n8\nWALL\n"
+        "10\n1\n20\n2\n11\n4\n21\n6\n0\nENDSEC\n0\nEOF\n"};
 
-    totcad::GDocumentEntity document;
-    QString error;
-    ASSERT_TRUE(totcad::GDXFParser{}.parse(groups, document, &error)) << error.toStdString();
-    ASSERT_EQ(document.entityCount(), 2);
-    EXPECT_TRUE(document.layers().contains(QStringLiteral("WALL")));
-    EXPECT_NE(std::dynamic_pointer_cast<totcad::GLineEntity>(document.entity(0xA1)), nullptr);
-    EXPECT_NE(std::dynamic_pointer_cast<totcad::GCircleEntity>(document.entity(0xA2)), nullptr);
+    totcad::dxf::DXFDocument document;
+    std::string error;
+    ASSERT_TRUE(totcad::dxf::Reader{}.read(input, document, &error)) << error;
+
+    ASSERT_NE(document.findTable("layer"), nullptr);
+    ASSERT_EQ(document.findTable("LAYER")->records.size(), 1U);
+    EXPECT_EQ(document.findTable("LAYER")->records.front().stringValue(2), "WALL");
+    ASSERT_EQ(document.blocks.size(), 1U);
+    EXPECT_EQ(document.blocks.front().definition.stringValue(2), "DOOR");
+    ASSERT_EQ(document.entities.size(), 1U);
+    EXPECT_EQ(document.entities.front().type, "LINE");
+    EXPECT_DOUBLE_EQ(document.entities.front().doubleValue(21).value_or(0.0), 6.0);
+}
+
+TEST(DXFReaderTest, DoesNotChangeDocumentAfterAnError)
+{
+    totcad::dxf::DXFDocument document;
+    document.entities.push_back({"KEEP", {}});
+    std::istringstream input{"0\nSECTION\n2\nENTITIES\n10\n"};
+    std::string error;
+
+    EXPECT_FALSE(totcad::dxf::Reader{}.read(input, document, &error));
+    ASSERT_EQ(document.entities.size(), 1U);
+    EXPECT_EQ(document.entities.front().type, "KEEP");
+    EXPECT_FALSE(error.empty());
 }
 
 } // namespace

@@ -14,7 +14,7 @@
 namespace totcad
 {
 
-GAnnotationController::GAnnotationController(GAnnotationDocument *document, QUndoStack *undoStack, QObject *parent)
+GAnnotationController::GAnnotationController(GAnnotationModel *document, QUndoStack *undoStack, QObject *parent)
     : QObject(parent), m_document(document), m_undoStack(undoStack)
 {
 }

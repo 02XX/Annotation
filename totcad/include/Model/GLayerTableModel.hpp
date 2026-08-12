@@ -1,18 +1,19 @@
 #pragma once
 
 #include <QAbstractTableModel>
-#include <QStringList>
+#include <string>
+#include <vector>
 
 namespace totcad {
 
-class GDocumentEntity;
+class GDXFModel;
 
 class GLayerTableModel final : public QAbstractTableModel
 {
     Q_OBJECT
 public:
     explicit GLayerTableModel(QObject *parent = nullptr);
-    void setDocument(GDocumentEntity *document);
+    void setDrawing(GDXFModel *drawing);
     int rowCount(const QModelIndex &parent = {}) const override;
     int columnCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role) const override;
@@ -21,8 +22,8 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
 private:
-    GDocumentEntity *m_document{nullptr};
-    QStringList m_layerNames;
+    GDXFModel *m_drawing{nullptr};
+    std::vector<std::string> m_layerNames;
 };
 
 } // namespace totcad

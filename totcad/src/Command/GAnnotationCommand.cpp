@@ -2,7 +2,7 @@
 
 namespace totcad {
 
-GAnnotationCommand::GAnnotationCommand(GAnnotationDocument *document,
+GAnnotationCommand::GAnnotationCommand(GAnnotationModel *document,
                                      const QString &text,
                                      QUndoCommand *parent)
     : QUndoCommand(text, parent), m_document(document), m_before(document->snapshot())

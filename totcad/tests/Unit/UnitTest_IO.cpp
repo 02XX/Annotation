@@ -1,5 +1,5 @@
 #include "IO/GAnnotationSerializer.hpp"
-#include "Model/Annotation/GAnnotationDocument.hpp"
+#include "Model/GAnnotationModel.hpp"
 
 #include <QTemporaryDir>
 #include <gtest/gtest.h>
@@ -12,7 +12,7 @@ TEST(GAnnotationSerializerTest, RoundTripsAnnotationRelations)
     ASSERT_TRUE(directory.isValid());
     const QString filePath = directory.filePath(QStringLiteral("drawing.json"));
 
-    totcad::GAnnotationDocument source;
+    totcad::GAnnotationModel source;
     const QString type = source.addType(QStringLiteral("沙发"), QColor(QStringLiteral("#12AB34")));
     const QString instance = source.addInstance(type, QStringLiteral("沙发1"));
     constexpr totcad::EntityID firstEntityId = UINT64_C(9007199254740993);
@@ -23,7 +23,7 @@ TEST(GAnnotationSerializerTest, RoundTripsAnnotationRelations)
     totcad::GAnnotationSerializer serializer;
     ASSERT_TRUE(serializer.save(filePath, source, &error)) << error.toStdString();
 
-    totcad::GAnnotationDocument loaded;
+    totcad::GAnnotationModel loaded;
     ASSERT_TRUE(serializer.load(filePath, loaded, &error)) << error.toStdString();
     ASSERT_NE(loaded.type(type), nullptr);
     ASSERT_NE(loaded.instance(instance), nullptr);

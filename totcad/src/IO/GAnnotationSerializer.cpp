@@ -1,6 +1,6 @@
 #include "IO/GAnnotationSerializer.hpp"
 
-#include "Model/Annotation/GAnnotationDocument.hpp"
+#include "Model/GAnnotationModel.hpp"
 
 #include <QFile>
 #include <QJsonArray>
@@ -34,7 +34,7 @@ EntityID entityIdFromJson(const QJsonValue &value)
 } // namespace
 
 bool GAnnotationSerializer::save(const QString &filePath,
-                                const GAnnotationDocument &document,
+                                const GAnnotationModel &document,
                                 QString *errorMessage) const
 {
     QJsonArray types;
@@ -79,7 +79,7 @@ bool GAnnotationSerializer::save(const QString &filePath,
 }
 
 bool GAnnotationSerializer::load(const QString &filePath,
-                                GAnnotationDocument &document,
+                                GAnnotationModel &document,
                                 QString *errorMessage) const
 {
     QFile file(filePath);

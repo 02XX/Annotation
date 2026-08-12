@@ -1,14 +1,17 @@
 #pragma once
 #include <QDockWidget>
 class QTableView;
-namespace totcad {
+namespace totcad
+{
 class GLayerTableModel;
-class GLayerDockWidget final : public QDockWidget {
+class GLayerDockWidget final : public QDockWidget
+{
     Q_OBJECT
-public:
+  public:
     explicit GLayerDockWidget(QWidget *parent = nullptr);
     void setModel(GLayerTableModel *model);
-private:
+
+  private:
     QTableView *m_table{nullptr};
 };
 } // namespace totcad

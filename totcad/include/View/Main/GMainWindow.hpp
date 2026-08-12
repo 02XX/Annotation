@@ -10,11 +10,11 @@ class QUndoStack;
 
 namespace totcad {
 
-class GDocumentEntity;
-class GAnnotationDocument;
+class GDXFModel;
+class GAnnotationModel;
 class GScene;
 class GView;
-class GDocumentController;
+class GFileController;
 class GAnnotationController;
 class GSelectionController;
 class GToolController;
@@ -49,12 +49,12 @@ private:
     void updateActionStates();
     void updateWindowTitle();
 
-    GDocumentEntity *m_cadDocument{nullptr};
-    GAnnotationDocument *m_annotationDocument{nullptr};
+    GDXFModel *m_cadDocument{nullptr};
+    GAnnotationModel *m_annotationDocument{nullptr};
     QUndoStack *m_undoStack{nullptr};
     GScene *m_cadScene{nullptr};
     GView *m_cadView{nullptr};
-    GDocumentController *m_documentController{nullptr};
+    GFileController *m_fileController{nullptr};
     GAnnotationController *m_annotationController{nullptr};
     GSelectionController *m_selectionController{nullptr};
     GToolController *m_toolController{nullptr};

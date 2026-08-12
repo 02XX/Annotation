@@ -1,18 +1,18 @@
 #include "Model/GInstanceTreeModel.hpp"
 
 #include "Command/Instance/GRenameInstanceCommand.hpp"
-#include "Model/Annotation/GAnnotationDocument.hpp"
+#include "Model/GAnnotationModel.hpp"
 
 #include <QUndoStack>
 
 namespace totcad {
 
-GInstanceTreeModel::GInstanceTreeModel(GAnnotationDocument *document, QUndoStack *undoStack, QObject *parent)
+GInstanceTreeModel::GInstanceTreeModel(GAnnotationModel *document, QUndoStack *undoStack, QObject *parent)
     : QAbstractItemModel(parent), m_document(document), m_undoStack(undoStack)
 {
     const auto refresh = [this] { beginResetModel(); endResetModel(); };
-    connect(document, &GAnnotationDocument::instancesChanged, this, refresh);
-    connect(document, &GAnnotationDocument::typesChanged, this, refresh);
+    connect(document, &GAnnotationModel::instancesChanged, this, refresh);
+    connect(document, &GAnnotationModel::typesChanged, this, refresh);
 }
 
 QModelIndex GInstanceTreeModel::index(int row, int column, const QModelIndex &parentIndex) const

@@ -3,7 +3,7 @@
 namespace totcad {
 
 GHatchEntity::GHatchEntity(const EntityID &id) : GEntity(id) {}
-
+QBou
 QRectF GHatchEntity::bounds() const
 {
     QRectF result;

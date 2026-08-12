@@ -2,19 +2,22 @@
 #include <QDockWidget>
 class QAction;
 class QTreeView;
-namespace totcad {
+namespace totcad
+{
 class GInstanceTreeModel;
-class GInstanceDockWidget final : public QDockWidget {
+class GInstanceDockWidget final : public QDockWidget
+{
     Q_OBJECT
-public:
+  public:
     explicit GInstanceDockWidget(QWidget *parent = nullptr);
     void setModel(GInstanceTreeModel *model);
     QString currentInstanceId() const;
-signals:
+  signals:
     void addRequested();
     void deleteRequested(const QString &instanceId);
     void instanceActivated(const QString &instanceId);
-private:
+
+  private:
     void updateActions();
     GInstanceTreeModel *m_model{nullptr};
     QTreeView *m_tree{nullptr};

@@ -6,13 +6,13 @@ class QUndoStack;
 
 namespace totcad {
 
-class GAnnotationDocument;
+class GAnnotationModel;
 
 class GInstanceTreeModel final : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    explicit GInstanceTreeModel(GAnnotationDocument *document, QUndoStack *undoStack, QObject *parent = nullptr);
+    explicit GInstanceTreeModel(GAnnotationModel *document, QUndoStack *undoStack, QObject *parent = nullptr);
     QModelIndex index(int row, int column, const QModelIndex &parent = {}) const override;
     QModelIndex parent(const QModelIndex &child) const override;
     int rowCount(const QModelIndex &parent = {}) const override;
@@ -27,7 +27,7 @@ public:
     QString instanceId(const QModelIndex &index) const;
 
 private:
-    GAnnotationDocument *m_document;
+    GAnnotationModel *m_document;
     QUndoStack *m_undoStack;
     QString m_typeId;
 };
