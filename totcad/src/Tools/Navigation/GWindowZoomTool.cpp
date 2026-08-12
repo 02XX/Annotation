@@ -1,8 +1,8 @@
 #include "Tools/Navigation/GWindowZoomTool.hpp"
-#include "Graphics/GCADView.hpp"
+#include "Graphics/GView.hpp"
 #include <QMouseEvent>
 namespace totcad {
-GWindowZoomTool::GWindowZoomTool(GCADView *view, QObject *parent) : GCADTool(view, parent) {}
+GWindowZoomTool::GWindowZoomTool(GView *view, QObject *parent) : GTool(view, parent) {}
 bool GWindowZoomTool::mousePress(QMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton) return false;
@@ -33,6 +33,6 @@ bool GWindowZoomTool::mouseRelease(QMouseEvent *event)
 void GWindowZoomTool::deactivate()
 {
     if (m_rubberBand) m_rubberBand->hide();
-    GCADTool::deactivate();
+    GTool::deactivate();
 }
 } // namespace totcad

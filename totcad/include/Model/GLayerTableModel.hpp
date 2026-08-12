@@ -5,14 +5,14 @@
 
 namespace totcad {
 
-class GCADDocument;
+class GDocumentEntity;
 
 class GLayerTableModel final : public QAbstractTableModel
 {
     Q_OBJECT
 public:
     explicit GLayerTableModel(QObject *parent = nullptr);
-    void setDocument(GCADDocument *document);
+    void setDocument(GDocumentEntity *document);
     int rowCount(const QModelIndex &parent = {}) const override;
     int columnCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role) const override;
@@ -21,7 +21,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
 private:
-    GCADDocument *m_document{nullptr};
+    GDocumentEntity *m_document{nullptr};
     QStringList m_layerNames;
 };
 

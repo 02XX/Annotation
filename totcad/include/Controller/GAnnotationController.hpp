@@ -1,8 +1,10 @@
 #pragma once
 
+#include "Model/Entities/GEntity.hpp"
+
 #include <QColor>
 #include <QObject>
-#include <QStringList>
+#include <QVector>
 
 class QUndoStack;
 
@@ -22,8 +24,8 @@ public:
     void changeTypeColor(const QString &typeId, const QColor &color);
     void addInstance(const QString &typeId);
     void deleteInstance(const QString &instanceId);
-    void assignType(const QStringList &entityIds, const QString &typeId);
-    void assignInstance(const QStringList &entityIds, const QString &instanceId);
+    void assignType(const QVector<EntityID> &entityIds, const QString &typeId);
+    void assignInstance(const QVector<EntityID> &entityIds, const QString &instanceId);
 
 private:
     GAnnotationDocument *m_document;

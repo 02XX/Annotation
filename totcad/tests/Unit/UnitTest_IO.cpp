@@ -15,7 +15,9 @@ TEST(GAnnotationSerializerTest, RoundTripsAnnotationRelations)
     totcad::GAnnotationDocument source;
     const QString type = source.addType(QStringLiteral("沙发"), QColor(QStringLiteral("#12AB34")));
     const QString instance = source.addInstance(type, QStringLiteral("沙发1"));
-    source.assignInstance({QStringLiteral("2A"), QStringLiteral("2B")}, instance);
+    constexpr totcad::EntityID firstEntityId = UINT64_C(9007199254740993);
+    constexpr totcad::EntityID secondEntityId = UINT64_C(9007199254740994);
+    source.assignInstance({firstEntityId, secondEntityId}, instance);
 
     QString error;
     totcad::GAnnotationSerializer serializer;
@@ -26,8 +28,8 @@ TEST(GAnnotationSerializerTest, RoundTripsAnnotationRelations)
     ASSERT_NE(loaded.type(type), nullptr);
     ASSERT_NE(loaded.instance(instance), nullptr);
     EXPECT_EQ(loaded.type(type)->color, QColor(QStringLiteral("#12AB34")));
-    EXPECT_EQ(loaded.instanceForEntity(QStringLiteral("2A")), instance);
-    EXPECT_EQ(loaded.typeForEntity(QStringLiteral("2B")), type);
+    EXPECT_EQ(loaded.instanceForEntity(firstEntityId), instance);
+    EXPECT_EQ(loaded.typeForEntity(secondEntityId), type);
     EXPECT_FALSE(loaded.isDirty());
 }
 

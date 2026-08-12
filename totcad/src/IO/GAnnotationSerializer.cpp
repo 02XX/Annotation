@@ -10,6 +10,29 @@
 
 namespace totcad {
 
+namespace {
+QString entityIdToString(EntityID entityId)
+{
+    return QString::number(static_cast<qulonglong>(entityId));
+}
+
+EntityID entityIdFromString(const QString &value)
+{
+    bool ok = false;
+    qulonglong result = value.toULongLong(&ok, 10);
+    if (!ok)
+        result = value.toULongLong(&ok, 16);
+    return ok ? static_cast<EntityID>(result) : EntityID{};
+}
+
+EntityID entityIdFromJson(const QJsonValue &value)
+{
+    if (value.isString())
+        return entityIdFromString(value.toString());
+    return static_cast<EntityID>(value.toVariant().toULongLong());
+}
+} // namespace
+
 bool GAnnotationSerializer::save(const QString &filePath,
                                 const GAnnotationDocument &document,
                                 QString *errorMessage) const
@@ -23,8 +46,8 @@ bool GAnnotationSerializer::save(const QString &filePath,
     QJsonArray instances;
     for (const GAnnotationInstance &instance : document.instances()) {
         QJsonArray entityIds;
-        for (const QString &entityId : instance.entityIds)
-            entityIds.append(entityId);
+        for (EntityID entityId : instance.entityIds)
+            entityIds.append(entityIdToString(entityId));
         instances.append(QJsonObject{{QStringLiteral("id"), instance.id},
                                      {QStringLiteral("typeId"), instance.typeId},
                                      {QStringLiteral("name"), instance.name},
@@ -33,7 +56,7 @@ bool GAnnotationSerializer::save(const QString &filePath,
 
     QJsonObject entityTypes;
     for (auto it = document.entityTypes().cbegin(); it != document.entityTypes().cend(); ++it)
-        entityTypes.insert(it.key(), it.value());
+        entityTypes.insert(entityIdToString(it.key()), it.value());
 
     QJsonObject root{{QStringLiteral("version"), 1},
                      {QStringLiteral("types"), types},
@@ -96,9 +119,10 @@ bool GAnnotationSerializer::load(const QString &filePath,
         instance.id = value.value(QStringLiteral("id")).toString();
         instance.typeId = value.value(QStringLiteral("typeId")).toString();
         instance.name = value.value(QStringLiteral("name")).toString();
-        for (const QJsonValue &entityId : value.value(QStringLiteral("entityIds")).toArray()) {
-            instance.entityIds.insert(entityId.toString());
-            snapshot.entityInstances.insert(entityId.toString(), instance.id);
+        for (const QJsonValue &entityIdValue : value.value(QStringLiteral("entityIds")).toArray()) {
+            const EntityID entityId = entityIdFromJson(entityIdValue);
+            instance.entityIds.insert(entityId);
+            snapshot.entityInstances.insert(entityId, instance.id);
         }
         if (!instance.id.isEmpty() && !instance.typeId.isEmpty())
             snapshot.instances.append(instance);
@@ -106,7 +130,7 @@ bool GAnnotationSerializer::load(const QString &filePath,
 
     const QJsonObject entityTypes = root.value(QStringLiteral("entityTypes")).toObject();
     for (auto it = entityTypes.constBegin(); it != entityTypes.constEnd(); ++it)
-        snapshot.entityTypes.insert(it.key(), it.value().toString());
+        snapshot.entityTypes.insert(entityIdFromString(it.key()), it.value().toString());
 
     document.restore(snapshot, false);
     document.setClean();

@@ -1,15 +1,17 @@
 #pragma once
+#include "Model/Entities/GEntity.hpp"
 #include <QObject>
+#include <QVector>
 namespace totcad {
-class GCADScene;
+class GScene;
 class GSelectionController final : public QObject {
     Q_OBJECT
 public:
-    explicit GSelectionController(GCADScene *scene, QObject *parent = nullptr);
-    QStringList selectedEntityIds() const;
+    explicit GSelectionController(GScene *scene, QObject *parent = nullptr);
+    QVector<EntityID> selectedEntityIds() const;
 signals:
-    void selectionChanged(const QStringList &entityIds);
+    void selectionChanged(const QVector<EntityID> &entityIds);
 private:
-    GCADScene *m_scene;
+    GScene *m_scene;
 };
 } // namespace totcad

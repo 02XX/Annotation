@@ -1,13 +1,15 @@
 #pragma once
-#include "Tools/GCADTool.hpp"
+#include "Model/Entities/GEntity.hpp"
+#include "Tools/GTool.hpp"
+#include <QVector>
 namespace totcad {
-class GTypeAnnotationTool final : public GCADTool {
+class GTypeAnnotationTool final : public GTool {
     Q_OBJECT
 public:
-    explicit GTypeAnnotationTool(GCADView *view, QObject *parent = nullptr);
+    explicit GTypeAnnotationTool(GView *view, QObject *parent = nullptr);
     bool mousePress(QMouseEvent *event) override;
     bool keyPress(QKeyEvent *event) override;
 signals:
-    void assignmentRequested(const QStringList &entityIds);
+    void assignmentRequested(const QVector<EntityID> &entityIds);
 };
 } // namespace totcad

@@ -48,12 +48,12 @@ void GAnnotationController::deleteInstance(const QString &id)
     if (!id.isEmpty())
         m_undoStack->push(new GDeleteInstanceCommand(m_document, id));
 }
-void GAnnotationController::assignType(const QStringList &ids, const QString &typeId)
+void GAnnotationController::assignType(const QVector<EntityID> &ids, const QString &typeId)
 {
     if (!ids.isEmpty() && !typeId.isEmpty())
         m_undoStack->push(new GAssignTypeCommand(m_document, ids, typeId));
 }
-void GAnnotationController::assignInstance(const QStringList &ids, const QString &instanceId)
+void GAnnotationController::assignInstance(const QVector<EntityID> &ids, const QString &instanceId)
 {
     if (!ids.isEmpty() && !instanceId.isEmpty())
         m_undoStack->push(new GAssignInstanceCommand(m_document, ids, instanceId));

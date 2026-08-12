@@ -1,8 +1,8 @@
 #pragma once
-#include "Tools/GCADTool.hpp"
+#include "Tools/GTool.hpp"
 namespace totcad {
-class GSelectTool final : public GCADTool {
+class GSelectTool final : public GTool {
     Q_OBJECT
-public: explicit GSelectTool(GCADView *view, QObject *parent = nullptr);
+public: explicit GSelectTool(GView *view, QObject *parent = nullptr);
 };
 } // namespace totcad

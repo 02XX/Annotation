@@ -1,9 +1,10 @@
 #pragma once
-#include <QStringList>
+#include "Model/Entities/GEntity.hpp"
+#include <QVector>
 namespace totcad {
-class GCADScene;
+class GScene;
 class GEntityPicker {
 public:
-    static QStringList selectedEntities(const GCADScene &scene);
+    static QVector<EntityID> selectedEntities(const GScene &scene);
 };
 } // namespace totcad

@@ -4,13 +4,13 @@
 
 namespace totcad {
 
-class GCADDocument;
+class GDocumentEntity;
 
 class GDXFParser
 {
 public:
-    bool parseFile(const QString &filePath, GCADDocument &document, QString *errorMessage = nullptr) const;
-    bool parse(const QVector<GDXFGroup> &groups, GCADDocument &document, QString *errorMessage = nullptr) const;
+    bool parseFile(const QString &filePath, GDocumentEntity &document, QString *errorMessage = nullptr) const;
+    bool parse(const QVector<GDXFGroup> &groups, GDocumentEntity &document, QString *errorMessage = nullptr) const;
 };
 
 } // namespace totcad

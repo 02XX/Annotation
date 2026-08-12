@@ -1,12 +1,12 @@
 #include "Model/GLayerTableModel.hpp"
 
-#include "Model/CAD/GCADDocument.hpp"
+#include "Model/Entities/GDocumentEntity.hpp"
 
 namespace totcad {
 
 GLayerTableModel::GLayerTableModel(QObject *parent) : QAbstractTableModel(parent) {}
 
-void GLayerTableModel::setDocument(GCADDocument *document)
+void GLayerTableModel::setDocument(GDocumentEntity *document)
 {
     beginResetModel();
     m_document = document;
@@ -22,7 +22,7 @@ QVariant GLayerTableModel::data(const QModelIndex &index, int role) const
 {
     if (!m_document || !index.isValid() || index.row() >= m_layerNames.size())
         return {};
-    const GCADLayer &layer = m_document->layers().value(m_layerNames.at(index.row()));
+    const GLayerEntity &layer = m_document->layers().value(m_layerNames.at(index.row()));
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case 0: return layer.name;
@@ -59,7 +59,7 @@ bool GLayerTableModel::setData(const QModelIndex &index, const QVariant &value, 
 {
     if (!m_document || role != Qt::CheckStateRole || index.column() != 4)
         return false;
-    GCADLayer &layer = m_document->layers()[m_layerNames.at(index.row())];
+    GLayerEntity &layer = m_document->layers()[m_layerNames.at(index.row())];
     layer.visible = value.toInt() == Qt::Checked;
     emit dataChanged(index, index, {Qt::CheckStateRole});
     emit m_document->layerVisibilityChanged(layer.name, layer.visible);

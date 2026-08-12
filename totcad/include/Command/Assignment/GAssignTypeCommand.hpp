@@ -1,9 +1,10 @@
 #pragma once
 #include "Command/GAnnotationCommand.hpp"
+#include "Model/Entities/GEntity.hpp"
 namespace totcad {
 class GAssignTypeCommand final : public GAnnotationCommand {
-public: GAssignTypeCommand(GAnnotationDocument *document, QStringList entityIds, QString typeId);
+public: GAssignTypeCommand(GAnnotationDocument *document, QVector<EntityID> entityIds, QString typeId);
 protected: void apply() override;
-private: QStringList m_entityIds; QString m_typeId;
+private: QVector<EntityID> m_entityIds; QString m_typeId;
 };
 } // namespace totcad

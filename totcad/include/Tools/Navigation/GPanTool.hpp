@@ -1,10 +1,10 @@
 #pragma once
-#include "Tools/GCADTool.hpp"
+#include "Tools/GTool.hpp"
 namespace totcad {
-class GPanTool final : public GCADTool {
+class GPanTool final : public GTool {
     Q_OBJECT
 public:
-    explicit GPanTool(GCADView *view, QObject *parent = nullptr);
+    explicit GPanTool(GView *view, QObject *parent = nullptr);
     bool mousePress(QMouseEvent *event) override;
     bool mouseMove(QMouseEvent *event) override;
     bool mouseRelease(QMouseEvent *event) override;

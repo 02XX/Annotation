@@ -1,5 +1,5 @@
 #include "Tools/Selection/GEntityPicker.hpp"
-#include "Graphics/GCADScene.hpp"
+#include "Graphics/GScene.hpp"
 namespace totcad {
-QStringList GEntityPicker::selectedEntities(const GCADScene &scene) { return scene.selectedEntityIds(); }
+QVector<EntityID> GEntityPicker::selectedEntities(const GScene &scene) { return scene.selectedEntityIds(); }
 } // namespace totcad

@@ -1,10 +1,10 @@
 #pragma once
-#include "Tools/GCADTool.hpp"
+#include "Tools/GTool.hpp"
 namespace totcad {
-class GRealtimeZoomTool final : public GCADTool {
+class GRealtimeZoomTool final : public GTool {
     Q_OBJECT
 public:
-    explicit GRealtimeZoomTool(GCADView *view, QObject *parent = nullptr);
+    explicit GRealtimeZoomTool(GView *view, QObject *parent = nullptr);
     bool mousePress(QMouseEvent *event) override;
     bool mouseMove(QMouseEvent *event) override;
     bool mouseRelease(QMouseEvent *event) override;

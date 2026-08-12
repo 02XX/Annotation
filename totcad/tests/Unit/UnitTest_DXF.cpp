@@ -1,7 +1,7 @@
 #include "DXF/GDXFParser.hpp"
-#include "Model/CAD/GCADCircle.hpp"
-#include "Model/CAD/GCADDocument.hpp"
-#include "Model/CAD/GCADLine.hpp"
+#include "Model/Entities/GCircleEntity.hpp"
+#include "Model/Entities/GDocumentEntity.hpp"
+#include "Model/Entities/GLineEntity.hpp"
 
 #include <gtest/gtest.h>
 
@@ -25,13 +25,13 @@ TEST(GDXFParserTest, ParsesLayersAndBasicEntities)
         {0, QStringLiteral("EOF"), 45}
     };
 
-    totcad::GCADDocument document;
+    totcad::GDocumentEntity document;
     QString error;
     ASSERT_TRUE(totcad::GDXFParser{}.parse(groups, document, &error)) << error.toStdString();
     ASSERT_EQ(document.entityCount(), 2);
     EXPECT_TRUE(document.layers().contains(QStringLiteral("WALL")));
-    EXPECT_EQ(document.entity(QStringLiteral("A1"))->type(), totcad::GCADEntityType::Line);
-    EXPECT_EQ(document.entity(QStringLiteral("A2"))->type(), totcad::GCADEntityType::Circle);
+    EXPECT_NE(std::dynamic_pointer_cast<totcad::GLineEntity>(document.entity(0xA1)), nullptr);
+    EXPECT_NE(std::dynamic_pointer_cast<totcad::GCircleEntity>(document.entity(0xA2)), nullptr);
 }
 
 } // namespace

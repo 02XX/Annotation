@@ -1,19 +1,20 @@
 #pragma once
 
 #include "DXF/GDXFGroup.hpp"
+#include "Model/Entities/GEntity.hpp"
 
 #include <memory>
 
 namespace totcad {
 
-class GCADEntity;
+class GEntity;
 
 class GDXFEntityParser
 {
 public:
-    std::shared_ptr<GCADEntity> parse(const QString &entityName,
+    std::shared_ptr<GEntity> parse(const QString &entityName,
                                      const QVector<GDXFGroup> &groups,
-                                     const QString &fallbackId) const;
+                                     EntityID fallbackId) const;
 };
 
 } // namespace totcad

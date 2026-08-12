@@ -4,14 +4,14 @@
 #include "IO/GAnnotationSerializer.hpp"
 #include "IO/GRecentFileManager.hpp"
 #include "Model/Annotation/GAnnotationDocument.hpp"
-#include "Model/CAD/GCADDocument.hpp"
+#include "Model/Entities/GDocumentEntity.hpp"
 
 #include <QFileInfo>
 #include <QUndoStack>
 
 namespace totcad {
 
-GDocumentController::GDocumentController(GCADDocument *cadDocument,
+GDocumentController::GDocumentController(GDocumentEntity *cadDocument,
                                          GAnnotationDocument *annotationDocument,
                                          QUndoStack *undoStack,
                                          QObject *parent)
@@ -28,7 +28,7 @@ GDocumentController::GDocumentController(GCADDocument *cadDocument,
 
 bool GDocumentController::open(const QString &filePath, QString *errorMessage)
 {
-    GCADDocument parsedCadDocument;
+    GDocumentEntity parsedCadDocument;
     if (!GDXFParser{}.parseFile(filePath, parsedCadDocument, errorMessage))
         return false;
 

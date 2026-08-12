@@ -12,8 +12,8 @@ namespace totcad {
 struct GAnnotationSnapshot {
     QVector<GAnnotationType> types;
     QVector<GAnnotationInstance> instances;
-    QHash<QString, QString> entityTypes;
-    QHash<QString, QString> entityInstances;
+    QHash<EntityID, QString> entityTypes;
+    QHash<EntityID, QString> entityInstances;
 };
 
 class GAnnotationDocument final : public QObject
@@ -24,14 +24,14 @@ public:
 
     const QVector<GAnnotationType> &types() const noexcept { return m_types; }
     const QVector<GAnnotationInstance> &instances() const noexcept { return m_instances; }
-    const QHash<QString, QString> &entityTypes() const noexcept { return m_entityTypes; }
-    const QHash<QString, QString> &entityInstances() const noexcept { return m_entityInstances; }
+    const QHash<EntityID, QString> &entityTypes() const noexcept { return m_entityTypes; }
+    const QHash<EntityID, QString> &entityInstances() const noexcept { return m_entityInstances; }
 
     const GAnnotationType *type(const QString &id) const;
     const GAnnotationInstance *instance(const QString &id) const;
     QVector<GAnnotationInstance> instancesForType(const QString &typeId) const;
-    QString typeForEntity(const QString &entityId) const { return m_entityTypes.value(entityId); }
-    QString instanceForEntity(const QString &entityId) const { return m_entityInstances.value(entityId); }
+    QString typeForEntity(EntityID entityId) const { return m_entityTypes.value(entityId); }
+    QString instanceForEntity(EntityID entityId) const { return m_entityInstances.value(entityId); }
     int assignedTypeEntityCount(const QString &typeId = {}) const;
     int assignedInstanceEntityCount(const QString &instanceId = {}) const;
 
@@ -47,9 +47,9 @@ public:
     bool removeInstance(const QString &id);
     bool setInstanceName(const QString &id, const QString &name);
 
-    void assignType(const QStringList &entityIds, const QString &typeId);
-    void assignInstance(const QStringList &entityIds, const QString &instanceId);
-    void clearAssignments(const QStringList &entityIds);
+    void assignType(const QVector<EntityID> &entityIds, const QString &typeId);
+    void assignInstance(const QVector<EntityID> &entityIds, const QString &instanceId);
+    void clearAssignments(const QVector<EntityID> &entityIds);
 
     GAnnotationSnapshot snapshot() const;
     void restore(const GAnnotationSnapshot &snapshot, bool markDirty = true);
@@ -71,8 +71,8 @@ private:
 
     QVector<GAnnotationType> m_types;
     QVector<GAnnotationInstance> m_instances;
-    QHash<QString, QString> m_entityTypes;
-    QHash<QString, QString> m_entityInstances;
+    QHash<EntityID, QString> m_entityTypes;
+    QHash<EntityID, QString> m_entityInstances;
     bool m_dirty{false};
 };
 

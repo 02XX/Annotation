@@ -6,14 +6,14 @@ class QUndoStack;
 
 namespace totcad {
 
-class GCADDocument;
+class GDocumentEntity;
 class GAnnotationDocument;
 
 class GDocumentController final : public QObject
 {
     Q_OBJECT
 public:
-    GDocumentController(GCADDocument *cadDocument,
+    GDocumentController(GDocumentEntity *cadDocument,
                         GAnnotationDocument *annotationDocument,
                         QUndoStack *undoStack,
                         QObject *parent = nullptr);
@@ -31,7 +31,7 @@ signals:
     void documentSaved(const QString &filePath);
 
 private:
-    GCADDocument *m_cadDocument;
+    GDocumentEntity *m_cadDocument;
     GAnnotationDocument *m_annotationDocument;
     QUndoStack *m_undoStack;
 };

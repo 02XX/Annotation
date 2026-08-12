@@ -5,9 +5,9 @@
 #include "Tools/Navigation/GRealtimeZoomTool.hpp"
 #include "Tools/Navigation/GWindowZoomTool.hpp"
 #include "Tools/Selection/GSelectTool.hpp"
-#include "Graphics/GCADView.hpp"
+#include "Graphics/GView.hpp"
 namespace totcad {
-GToolController::GToolController(GCADView *view, QObject *parent)
+GToolController::GToolController(GView *view, QObject *parent)
     : QObject(parent), m_view(view),
       m_selectTool(new GSelectTool(view, this)),
       m_typeAnnotationTool(new GTypeAnnotationTool(view, this)),
@@ -21,8 +21,8 @@ GToolController::GToolController(GCADView *view, QObject *parent)
     connect(m_instanceAnnotationTool, &GInstanceAnnotationTool::assignmentRequested,
             this, &GToolController::instanceAssignmentRequested);
     const auto cancel = [this] { activate(Mode::Select); };
-    connect(m_typeAnnotationTool, &GCADTool::canceled, this, cancel);
-    connect(m_instanceAnnotationTool, &GCADTool::canceled, this, cancel);
+    connect(m_typeAnnotationTool, &GTool::canceled, this, cancel);
+    connect(m_instanceAnnotationTool, &GTool::canceled, this, cancel);
     activate(Mode::Select);
 }
 void GToolController::activate(Mode modeValue)

@@ -1,11 +1,11 @@
 #pragma once
-#include "Tools/GCADTool.hpp"
+#include "Tools/GTool.hpp"
 #include <QRubberBand>
 namespace totcad {
-class GWindowZoomTool final : public GCADTool {
+class GWindowZoomTool final : public GTool {
     Q_OBJECT
 public:
-    explicit GWindowZoomTool(GCADView *view, QObject *parent = nullptr);
+    explicit GWindowZoomTool(GView *view, QObject *parent = nullptr);
     bool mousePress(QMouseEvent *event) override;
     bool mouseMove(QMouseEvent *event) override;
     bool mouseRelease(QMouseEvent *event) override;

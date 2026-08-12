@@ -1,9 +1,9 @@
 #include "Tools/Navigation/GRealtimeZoomTool.hpp"
-#include "Graphics/GCADView.hpp"
+#include "Graphics/GView.hpp"
 #include <QMouseEvent>
 #include <QtMath>
 namespace totcad {
-GRealtimeZoomTool::GRealtimeZoomTool(GCADView *view, QObject *parent) : GCADTool(view, parent) {}
+GRealtimeZoomTool::GRealtimeZoomTool(GView *view, QObject *parent) : GTool(view, parent) {}
 bool GRealtimeZoomTool::mousePress(QMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton) return false;

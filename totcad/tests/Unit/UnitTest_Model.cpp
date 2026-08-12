@@ -7,6 +7,16 @@
 
 namespace {
 
+TEST(GEntityTest, StoresTypedEntityId)
+{
+    totcad::GEntity entity(0);
+    entity.setId(42);
+
+    const totcad::IEntity<totcad::EntityID> *interfaceEntity = &entity;
+    EXPECT_NE(interfaceEntity, nullptr);
+    EXPECT_EQ(entity.id(), 42U);
+}
+
 TEST(GAnnotationDocumentTest, EnforcesTypeAndInstanceRelations)
 {
     totcad::GAnnotationDocument document;
@@ -14,15 +24,15 @@ TEST(GAnnotationDocumentTest, EnforcesTypeAndInstanceRelations)
     const QString secondType = document.addType(QStringLiteral("窗"), Qt::blue);
     const QString instance = document.addInstance(firstType, QStringLiteral("门1"));
 
-    document.assignInstance({QStringLiteral("10"), QStringLiteral("11")}, instance);
-    EXPECT_EQ(document.typeForEntity(QStringLiteral("10")), firstType);
-    EXPECT_EQ(document.instanceForEntity(QStringLiteral("10")), instance);
+    document.assignInstance({10, 11}, instance);
+    EXPECT_EQ(document.typeForEntity(10), firstType);
+    EXPECT_EQ(document.instanceForEntity(10), instance);
 
-    document.assignType({QStringLiteral("10")}, secondType);
-    EXPECT_EQ(document.typeForEntity(QStringLiteral("10")), secondType);
-    EXPECT_TRUE(document.instanceForEntity(QStringLiteral("10")).isEmpty());
+    document.assignType({10}, secondType);
+    EXPECT_EQ(document.typeForEntity(10), secondType);
+    EXPECT_TRUE(document.instanceForEntity(10).isEmpty());
     ASSERT_NE(document.instance(instance), nullptr);
-    EXPECT_FALSE(document.instance(instance)->entityIds.contains(QStringLiteral("10")));
+    EXPECT_FALSE(document.instance(instance)->entityIds.contains(10));
 }
 
 TEST(GAnnotationCommandTest, RestoresCascadeDeletion)
@@ -30,17 +40,17 @@ TEST(GAnnotationCommandTest, RestoresCascadeDeletion)
     totcad::GAnnotationDocument document;
     const QString type = document.addType(QStringLiteral("桌子"), Qt::green);
     const QString instance = document.addInstance(type, QStringLiteral("桌子1"));
-    document.assignInstance({QStringLiteral("AB")}, instance);
+    document.assignInstance({0xAB}, instance);
 
     QUndoStack stack;
     stack.push(new totcad::GDeleteTypeCommand(&document, type));
     EXPECT_EQ(document.types().size(), 0);
-    EXPECT_TRUE(document.instanceForEntity(QStringLiteral("AB")).isEmpty());
+    EXPECT_TRUE(document.instanceForEntity(0xAB).isEmpty());
 
     stack.undo();
     EXPECT_NE(document.type(type), nullptr);
     EXPECT_NE(document.instance(instance), nullptr);
-    EXPECT_EQ(document.instanceForEntity(QStringLiteral("AB")), instance);
+    EXPECT_EQ(document.instanceForEntity(0xAB), instance);
 }
 
 } // namespace

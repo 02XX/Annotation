@@ -1,8 +1,8 @@
 #include "Tools/Navigation/GPanTool.hpp"
-#include "Graphics/GCADView.hpp"
+#include "Graphics/GView.hpp"
 #include <QMouseEvent>
 namespace totcad {
-GPanTool::GPanTool(GCADView *view, QObject *parent) : GCADTool(view, parent) {}
+GPanTool::GPanTool(GView *view, QObject *parent) : GTool(view, parent) {}
 bool GPanTool::mousePress(QMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton) return false;

@@ -2,8 +2,8 @@
 
 #include "DXF/GDXFEntityParser.hpp"
 #include "DXF/GDXFReader.hpp"
-#include "Model/CAD/GCADDocument.hpp"
-#include "Model/CAD/GCADPolyline.hpp"
+#include "Model/Entities/GDocumentEntity.hpp"
+#include "Model/Entities/GPolylineEntity.hpp"
 
 #include <QtMath>
 
@@ -68,11 +68,24 @@ QColor aciColor(int value)
     }
 }
 
-void parseTables(const QVector<GDXFGroup> &section, GCADDocument &document)
+EntityID stableEntityId(const QString &value)
+{
+    constexpr EntityID offsetBasis = UINT64_C(14695981039346656037);
+    constexpr EntityID prime = UINT64_C(1099511628211);
+    EntityID result = offsetBasis;
+    const QByteArray bytes = value.toUtf8();
+    for (char byte : bytes) {
+        result ^= static_cast<unsigned char>(byte);
+        result *= prime;
+    }
+    return result;
+}
+
+void parseTables(const QVector<GDXFGroup> &section, GDocumentEntity &document)
 {
     for (const Record &record : records(section, 0, section.size())) {
         if (record.first == QLatin1String("LAYER")) {
-            GCADLayer layer;
+            GLayerEntity layer;
             layer.name = valueOf(record.second, 2, QStringLiteral("0"));
             layer.colorIndex = intValueOf(record.second, 62, 7);
             layer.visible = layer.colorIndex >= 0;
@@ -84,7 +97,7 @@ void parseTables(const QVector<GDXFGroup> &section, GCADDocument &document)
             layer.lineWidth = static_cast<double>(intValueOf(record.second, 370, 0)) / 100.0;
             document.addLayer(layer);
         } else if (record.first == QLatin1String("LTYPE")) {
-            GCADLineType lineType;
+            GLineTypeEntity lineType;
             lineType.name = valueOf(record.second, 2, QStringLiteral("CONTINUOUS"));
             lineType.description = valueOf(record.second, 3);
             for (const GDXFGroup &group : record.second)
@@ -96,8 +109,8 @@ void parseTables(const QVector<GDXFGroup> &section, GCADDocument &document)
 }
 
 void parseEntities(const QVector<Record> &source,
-                   std::vector<std::shared_ptr<GCADEntity>> *blockEntities,
-                   GCADDocument *document,
+                   std::vector<std::shared_ptr<GEntity>> *blockEntities,
+                   GDocumentEntity *document,
                    const QString &idPrefix)
 {
     GDXFEntityParser parser;
@@ -106,12 +119,13 @@ void parseEntities(const QVector<Record> &source,
         const Record &record = source.at(i);
         if (record.first == QLatin1String("VERTEX") || record.first == QLatin1String("SEQEND"))
             continue;
-        auto entity = parser.parse(record.first, record.second, idPrefix + QString::number(++generated));
+        const EntityID fallbackId = stableEntityId(idPrefix + QString::number(++generated));
+        auto entity = parser.parse(record.first, record.second, fallbackId);
         if (!entity)
             continue;
 
         if (record.first == QLatin1String("POLYLINE")) {
-            auto polyline = std::dynamic_pointer_cast<GCADPolyline>(entity);
+            auto polyline = std::dynamic_pointer_cast<GPolylineEntity>(entity);
             polyline->vertices.clear();
             polyline->bulges.clear();
             int vertexIndex = i + 1;
@@ -139,7 +153,7 @@ void parseEntities(const QVector<Record> &source,
     }
 }
 
-void parseBlocks(const QVector<GDXFGroup> &section, GCADDocument &document)
+void parseBlocks(const QVector<GDXFGroup> &section, GDocumentEntity &document)
 {
     const QVector<Record> values = records(section, 0, section.size());
     int index = 0;
@@ -148,7 +162,7 @@ void parseBlocks(const QVector<GDXFGroup> &section, GCADDocument &document)
             ++index;
             continue;
         }
-        GCADBlock block;
+        GBlockEntity block;
         block.name = valueOf(values.at(index).second, 2);
         double x = 0.0;
         double y = 0.0;
@@ -170,7 +184,7 @@ void parseBlocks(const QVector<GDXFGroup> &section, GCADDocument &document)
 }
 }
 
-bool GDXFParser::parseFile(const QString &filePath, GCADDocument &document, QString *errorMessage) const
+bool GDXFParser::parseFile(const QString &filePath, GDocumentEntity &document, QString *errorMessage) const
 {
     QVector<GDXFGroup> groups;
     if (!GDXFReader{}.readFile(filePath, groups, errorMessage))
@@ -181,7 +195,7 @@ bool GDXFParser::parseFile(const QString &filePath, GCADDocument &document, QStr
     return true;
 }
 
-bool GDXFParser::parse(const QVector<GDXFGroup> &groups, GCADDocument &document, QString *errorMessage) const
+bool GDXFParser::parse(const QVector<GDXFGroup> &groups, GDocumentEntity &document, QString *errorMessage) const
 {
     document.clear();
     bool foundEntities = false;

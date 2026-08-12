@@ -179,7 +179,7 @@ bool GAnnotationDocument::removeInstance(const QString &id)
     const int index = instanceIndex(id);
     if (index < 0)
         return false;
-    for (const QString &entityId : m_instances.at(index).entityIds)
+    for (EntityID entityId : m_instances.at(index).entityIds)
         m_entityInstances.remove(entityId);
     m_instances.removeAt(index);
     markDirty();
@@ -199,11 +199,11 @@ bool GAnnotationDocument::setInstanceName(const QString &id, const QString &name
     return true;
 }
 
-void GAnnotationDocument::assignType(const QStringList &entityIds, const QString &typeId)
+void GAnnotationDocument::assignType(const QVector<EntityID> &entityIds, const QString &typeId)
 {
     if (!type(typeId) || entityIds.isEmpty())
         return;
-    for (const QString &entityId : entityIds) {
+    for (EntityID entityId : entityIds) {
         m_entityTypes.insert(entityId, typeId);
         const QString currentInstanceId = m_entityInstances.value(entityId);
         const GAnnotationInstance *currentInstance = instance(currentInstanceId);
@@ -218,13 +218,13 @@ void GAnnotationDocument::assignType(const QStringList &entityIds, const QString
     emit assignmentsChanged();
 }
 
-void GAnnotationDocument::assignInstance(const QStringList &entityIds, const QString &instanceId)
+void GAnnotationDocument::assignInstance(const QVector<EntityID> &entityIds, const QString &instanceId)
 {
     const int targetIndex = instanceIndex(instanceId);
     if (targetIndex < 0 || entityIds.isEmpty())
         return;
     const QString targetType = m_instances.at(targetIndex).typeId;
-    for (const QString &entityId : entityIds) {
+    for (EntityID entityId : entityIds) {
         const QString oldInstanceId = m_entityInstances.value(entityId);
         const int oldIndex = instanceIndex(oldInstanceId);
         if (oldIndex >= 0)
@@ -238,9 +238,9 @@ void GAnnotationDocument::assignInstance(const QStringList &entityIds, const QSt
     emit assignmentsChanged();
 }
 
-void GAnnotationDocument::clearAssignments(const QStringList &entityIds)
+void GAnnotationDocument::clearAssignments(const QVector<EntityID> &entityIds)
 {
-    for (const QString &entityId : entityIds) {
+    for (EntityID entityId : entityIds) {
         const int index = instanceIndex(m_entityInstances.take(entityId));
         if (index >= 0)
             m_instances[index].entityIds.remove(entityId);
