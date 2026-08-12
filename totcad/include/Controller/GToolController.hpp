@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QVector>
 namespace totcad {
-class GView;
+class GGraphicsView;
 class GSelectTool;
 class GTypeAnnotationTool;
 class GInstanceAnnotationTool;
@@ -15,7 +15,7 @@ class GToolController final : public QObject {
     Q_OBJECT
 public:
     enum class Mode { Select, TypeAnnotation, InstanceAnnotation, Pan, RealtimeZoom, WindowZoom };
-    explicit GToolController(GView *view, QObject *parent = nullptr);
+    explicit GToolController(GGraphicsView *view, QObject *parent = nullptr);
     void activate(Mode mode);
     Mode mode() const noexcept { return m_mode; }
 signals:
@@ -23,7 +23,7 @@ signals:
     void typeAssignmentRequested(const QVector<EntityID> &entityIds);
     void instanceAssignmentRequested(const QVector<EntityID> &entityIds);
 private:
-    GView *m_view;
+    GGraphicsView *m_view;
     GSelectTool *m_selectTool;
     GTypeAnnotationTool *m_typeAnnotationTool;
     GInstanceAnnotationTool *m_instanceAnnotationTool;

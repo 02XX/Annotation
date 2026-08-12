@@ -12,8 +12,8 @@ namespace totcad {
 
 class GDXFModel;
 class GAnnotationModel;
-class GScene;
-class GView;
+class GGraphicsScene;
+class GGraphicsView;
 class GFileController;
 class GAnnotationController;
 class GSelectionController;
@@ -52,8 +52,8 @@ private:
     GDXFModel *m_cadDocument{nullptr};
     GAnnotationModel *m_annotationDocument{nullptr};
     QUndoStack *m_undoStack{nullptr};
-    GScene *m_cadScene{nullptr};
-    GView *m_cadView{nullptr};
+    GGraphicsScene *m_cadScene{nullptr};
+    GGraphicsView *m_cadView{nullptr};
     GFileController *m_fileController{nullptr};
     GAnnotationController *m_annotationController{nullptr};
     GSelectionController *m_selectionController{nullptr};

@@ -1,4 +1,4 @@
-#include "DXF/Reader.hpp"
+#include "IO/DXF/Reader.hpp"
 
 #include <gtest/gtest.h>
 

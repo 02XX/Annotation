@@ -10,8 +10,8 @@
 #include "Model/GInstanceTreeModel.hpp"
 #include "Model/GLayerTableModel.hpp"
 #include "Model/GTypeTableModel.hpp"
-#include "Graphics/GScene.hpp"
-#include "Graphics/GView.hpp"
+#include "View/Canvas/GGraphicsScene.hpp"
+#include "View/Canvas/GGraphicsView.hpp"
 #include "View/Dialog/GAboutDialog.hpp"
 #include "View/Dock/GInstanceDockWidget.hpp"
 #include "View/Dock/GLayerDockWidget.hpp"
@@ -52,9 +52,9 @@ void GMainWindow::createWorkspace()
     m_cadDocument = new GDXFModel(this);
     m_annotationDocument = new GAnnotationModel(this);
     m_undoStack = new QUndoStack(this);
-    m_cadScene = new GScene(this);
+    m_cadScene = new GGraphicsScene(this);
     m_cadScene->setDocuments(m_cadDocument, m_annotationDocument);
-    m_cadView = new GView(m_cadScene, this);
+    m_cadView = new GGraphicsView(m_cadScene, this);
     setCentralWidget(m_cadView);
 
     m_fileController = new GFileController(m_cadDocument, m_annotationDocument, m_undoStack, this);
@@ -191,7 +191,7 @@ void GMainWindow::createMenusAndToolbars()
     connect(m_saveAction, &QAction::triggered, this, &GMainWindow::saveDocument);
     connect(m_closeAction, &QAction::triggered, this, &GMainWindow::closeDocument);
     connect(exitAction, &QAction::triggered, this, &QWidget::close);
-    connect(m_showAllAction, &QAction::triggered, m_cadView, &GView::showAll);
+    connect(m_showAllAction, &QAction::triggered, m_cadView, &GGraphicsView::showAll);
     connect(m_typeAnnotationAction, &QAction::triggered, this, [this] {
         if (m_typeDock->currentTypeId().isEmpty()) {
             QMessageBox::information(this, tr("类型标注"), tr("请先新增并选中一个类型。"));
@@ -284,7 +284,7 @@ void GMainWindow::connectWorkspace()
         m_realtimeZoomAction->setChecked(mode == GToolController::Mode::RealtimeZoom);
         m_windowZoomAction->setChecked(mode == GToolController::Mode::WindowZoom);
     });
-    connect(m_cadView, &GView::mouseScenePositionChanged, this, [this](const QPointF &point) {
+    connect(m_cadView, &GGraphicsView::mouseScenePositionChanged, this, [this](const QPointF &point) {
         m_coordinateLabel->setText(tr("X: %1  Y: %2").arg(point.x(), 0, 'f', 2).arg(-point.y(), 0, 'f', 2));
     });
     const auto refresh = [this] { updateStatus(); updateActionStates(); updateWindowTitle(); };

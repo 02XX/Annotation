@@ -1,0 +1,26 @@
+#pragma once
+
+#include "View/Canvas/Items/GEntityItem.hpp"
+
+namespace totcad {
+
+class GHatchEntity;
+
+class GHatchItem final : public QGraphicsItem, public GEntityItem
+{
+public:
+    explicit GHatchItem(GHatchEntity *entity);
+    GHatchEntity *entity() const noexcept { return m_entity; }
+    QRectF boundingRect() const override;
+    QPainterPath shape() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+
+protected:
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+private:
+    QPainterPath entityPath() const;
+    GHatchEntity *m_entity{nullptr};
+};
+
+} // namespace totcad

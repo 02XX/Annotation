@@ -1,7 +1,7 @@
 #include "Controller/GFileController.hpp"
 
-#include "IO/GAnnotationSerializer.hpp"
-#include "DXF/GDXFLoader.hpp"
+#include "IO/Annotation/GAnnotationSerializer.hpp"
+#include "IO/DXF/GDXFLoader.hpp"
 #include "IO/GRecentFileManager.hpp"
 #include "Model/GAnnotationModel.hpp"
 #include "Model/GDXFModel.hpp"

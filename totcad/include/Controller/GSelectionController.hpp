@@ -3,15 +3,15 @@
 #include <QObject>
 #include <QVector>
 namespace totcad {
-class GScene;
+class GGraphicsScene;
 class GSelectionController final : public QObject {
     Q_OBJECT
 public:
-    explicit GSelectionController(GScene *scene, QObject *parent = nullptr);
+    explicit GSelectionController(GGraphicsScene *scene, QObject *parent = nullptr);
     QVector<EntityID> selectedEntityIds() const;
 signals:
     void selectionChanged(const QVector<EntityID> &entityIds);
 private:
-    GScene *m_scene;
+    GGraphicsScene *m_scene;
 };
 } // namespace totcad

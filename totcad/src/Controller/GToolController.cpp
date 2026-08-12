@@ -1,13 +1,14 @@
 #include "Controller/GToolController.hpp"
-#include "Tools/Annotation/GInstanceAnnotationTool.hpp"
-#include "Tools/Annotation/GTypeAnnotationTool.hpp"
-#include "Tools/Navigation/GPanTool.hpp"
-#include "Tools/Navigation/GRealtimeZoomTool.hpp"
-#include "Tools/Navigation/GWindowZoomTool.hpp"
-#include "Tools/Selection/GSelectTool.hpp"
-#include "Graphics/GView.hpp"
+#include "View/Canvas/Tools/Annotation/GInstanceAnnotationTool.hpp"
+#include "View/Canvas/Tools/Annotation/GTypeAnnotationTool.hpp"
+#include "View/Canvas/Tools/GCanvasTool.hpp"
+#include "View/Canvas/Tools/Navigation/GPanTool.hpp"
+#include "View/Canvas/Tools/Navigation/GRealtimeZoomTool.hpp"
+#include "View/Canvas/Tools/Navigation/GWindowZoomTool.hpp"
+#include "View/Canvas/Tools/Selection/GSelectTool.hpp"
+#include "View/Canvas/GGraphicsView.hpp"
 namespace totcad {
-GToolController::GToolController(GView *view, QObject *parent)
+GToolController::GToolController(GGraphicsView *view, QObject *parent)
     : QObject(parent), m_view(view),
       m_selectTool(new GSelectTool(view, this)),
       m_typeAnnotationTool(new GTypeAnnotationTool(view, this)),
@@ -21,8 +22,8 @@ GToolController::GToolController(GView *view, QObject *parent)
     connect(m_instanceAnnotationTool, &GInstanceAnnotationTool::assignmentRequested,
             this, &GToolController::instanceAssignmentRequested);
     const auto cancel = [this] { activate(Mode::Select); };
-    connect(m_typeAnnotationTool, &GTool::canceled, this, cancel);
-    connect(m_instanceAnnotationTool, &GTool::canceled, this, cancel);
+    connect(m_typeAnnotationTool, &GCanvasTool::canceled, this, cancel);
+    connect(m_instanceAnnotationTool, &GCanvasTool::canceled, this, cancel);
     activate(Mode::Select);
 }
 void GToolController::activate(Mode modeValue)

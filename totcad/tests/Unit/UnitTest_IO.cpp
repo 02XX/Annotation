@@ -1,4 +1,4 @@
-#include "IO/GAnnotationSerializer.hpp"
+#include "IO/Annotation/GAnnotationSerializer.hpp"
 #include "Model/GAnnotationModel.hpp"
 
 #include <QTemporaryDir>
