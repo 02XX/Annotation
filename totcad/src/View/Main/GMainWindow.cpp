@@ -27,6 +27,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QStyle>
 #include <QToolBar>
 #include <QUndoStack>
 
@@ -91,7 +92,13 @@ void GMainWindow::createWorkspace()
 
 void GMainWindow::createActions()
 {
+    m_openAction = new QAction(style()->standardIcon(QStyle::SP_DialogOpenButton), tr("打开文件…"), this);
+    m_openAction->setObjectName(QStringLiteral("OpenFileAction"));
+    m_openAction->setShortcut(QKeySequence::Open);
+    m_openAction->setStatusTip(tr("打开 DXF 文件"));
     m_saveAction = new QAction(tr("保存"), this);
+    m_saveAction->setObjectName(QStringLiteral("SaveFileAction"));
+    m_saveAction->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
     m_saveAction->setShortcut(QKeySequence::Save);
     m_closeAction = new QAction(tr("关闭"), this);
     m_closeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F4));
@@ -123,8 +130,7 @@ void GMainWindow::createActions()
 void GMainWindow::createMenusAndToolbars()
 {
     QMenu *fileMenu = menuBar()->addMenu(tr("文件"));
-    QAction *openAction = fileMenu->addAction(tr("打开…"));
-    openAction->setShortcut(QKeySequence::Open);
+    fileMenu->addAction(m_openAction);
     fileMenu->addAction(m_saveAction);
     fileMenu->addAction(m_closeAction);
     fileMenu->addSeparator();
@@ -160,7 +166,8 @@ void GMainWindow::createMenusAndToolbars()
 
     m_fileToolBar = addToolBar(tr("文件"));
     m_fileToolBar->setObjectName(QStringLiteral("FileToolBar"));
-    m_fileToolBar->addAction(openAction);
+    m_fileToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_fileToolBar->addAction(m_openAction);
     m_fileToolBar->addAction(m_saveAction);
     m_editToolBar = addToolBar(tr("编辑"));
     m_editToolBar->setObjectName(QStringLiteral("EditToolBar"));
@@ -180,10 +187,7 @@ void GMainWindow::createMenusAndToolbars()
     visibilityMenu->addAction(m_editToolBar->toggleViewAction());
     visibilityMenu->addAction(m_viewToolBar->toggleViewAction());
 
-    connect(openAction, &QAction::triggered, this, [this] {
-        const QString path = QFileDialog::getOpenFileName(this, tr("打开 DXF"), {}, tr("DXF 文件 (*.dxf);;所有文件 (*)"));
-        if (!path.isEmpty()) openFile(path);
-    });
+    connect(m_openAction, &QAction::triggered, this, &GMainWindow::showOpenFileDialog);
     connect(m_saveAction, &QAction::triggered, this, &GMainWindow::saveDocument);
     connect(m_closeAction, &QAction::triggered, this, &GMainWindow::closeDocument);
     connect(exitAction, &QAction::triggered, this, &QWidget::close);
@@ -217,6 +221,24 @@ void GMainWindow::createMenusAndToolbars()
     });
     connect(aboutAction, &QAction::triggered, this, [this] { GAboutDialog(this).exec(); });
     updateRecentFiles();
+}
+
+void GMainWindow::showOpenFileDialog()
+{
+    QFileDialog dialog(this, tr("打开 DXF 文件"));
+    dialog.setObjectName(QStringLiteral("OpenDXFFileDialog"));
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setNameFilters({tr("DXF 文件 (*.dxf)"), tr("所有文件 (*)")});
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog.setWindowModality(Qt::WindowModal);
+    dialog.resize(900, 600);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    const QStringList selectedFiles = dialog.selectedFiles();
+    if (!selectedFiles.isEmpty())
+        openFile(selectedFiles.first());
 }
 
 void GMainWindow::connectWorkspace()

@@ -39,6 +39,7 @@ private:
     void createActions();
     void createMenusAndToolbars();
     void connectWorkspace();
+    void showOpenFileDialog();
     bool openFile(const QString &filePath);
     bool saveDocument();
     bool confirmSaveIfModified();
@@ -68,6 +69,7 @@ private:
     QToolBar *m_fileToolBar{nullptr};
     QToolBar *m_editToolBar{nullptr};
     QToolBar *m_viewToolBar{nullptr};
+    QAction *m_openAction{nullptr};
     QAction *m_saveAction{nullptr};
     QAction *m_closeAction{nullptr};
     QAction *m_undoAction{nullptr};
