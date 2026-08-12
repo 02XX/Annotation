@@ -1,4 +1,4 @@
-#include "View/CAD/GInstanceBoxItem.hpp"
+#include "Graphics/GInstanceBoxItem.hpp"
 
 #include <QPen>
 

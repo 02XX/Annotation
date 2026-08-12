@@ -1,5 +1,5 @@
 #include "Tools/Navigation/GRealtimeZoomTool.hpp"
-#include "View/CAD/GCADView.hpp"
+#include "Graphics/GCADView.hpp"
 #include <QMouseEvent>
 #include <QtMath>
 namespace totcad {

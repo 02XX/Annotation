@@ -1,5 +1,5 @@
 #include "Tools/Navigation/GPanTool.hpp"
-#include "View/CAD/GCADView.hpp"
+#include "Graphics/GCADView.hpp"
 #include <QMouseEvent>
 namespace totcad {
 GPanTool::GPanTool(GCADView *view, QObject *parent) : GCADTool(view, parent) {}

@@ -5,7 +5,7 @@
 #include "Tools/Navigation/GRealtimeZoomTool.hpp"
 #include "Tools/Navigation/GWindowZoomTool.hpp"
 #include "Tools/Selection/GSelectTool.hpp"
-#include "View/CAD/GCADView.hpp"
+#include "Graphics/GCADView.hpp"
 namespace totcad {
 GToolController::GToolController(GCADView *view, QObject *parent)
     : QObject(parent), m_view(view),

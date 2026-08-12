@@ -1,4 +1,4 @@
-#include "View/CAD/GCADView.hpp"
+#include "Graphics/GCADView.hpp"
 
 #include "Tools/GCADTool.hpp"
 

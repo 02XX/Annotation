@@ -1,5 +1,5 @@
 #include "Controller/GSelectionController.hpp"
-#include "View/CAD/GCADScene.hpp"
+#include "Graphics/GCADScene.hpp"
 namespace totcad {
 GSelectionController::GSelectionController(GCADScene *scene, QObject *parent) : QObject(parent), m_scene(scene)
 {

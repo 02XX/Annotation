@@ -1,4 +1,4 @@
-#include "View/CAD/GCADScene.hpp"
+#include "Graphics/GCADScene.hpp"
 
 #include "Model/Annotation/GAnnotationDocument.hpp"
 #include "Model/CAD/GCADArc.hpp"
@@ -11,8 +11,8 @@
 #include "Model/CAD/GCADPoint.hpp"
 #include "Model/CAD/GCADPolyline.hpp"
 #include "Model/CAD/GCADText.hpp"
-#include "View/CAD/GCADEntityItem.hpp"
-#include "View/CAD/GInstanceBoxItem.hpp"
+#include "Graphics/GCADEntityItem.hpp"
+#include "Graphics/GInstanceBoxItem.hpp"
 
 #include <QFont>
 #include <QPainterPath>

@@ -1,4 +1,4 @@
-#include "View/CAD/GCADEntityItem.hpp"
+#include "Graphics/GCADEntityItem.hpp"
 
 namespace totcad {
 

@@ -1,6 +1,6 @@
 #include "Tools/Annotation/GTypeAnnotationTool.hpp"
-#include "View/CAD/GCADScene.hpp"
-#include "View/CAD/GCADView.hpp"
+#include "Graphics/GCADScene.hpp"
+#include "Graphics/GCADView.hpp"
 #include <QKeyEvent>
 #include <QMouseEvent>
 namespace totcad {

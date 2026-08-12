@@ -1,6 +1,6 @@
 #include "Tools/GCADTool.hpp"
 
-#include "View/CAD/GCADView.hpp"
+#include "Graphics/GCADView.hpp"
 
 namespace totcad {
 

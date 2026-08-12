@@ -4,9 +4,16 @@
 #include <QRectF>
 #include <QString>
 
-namespace totcad {
+namespace totcad
+{
+template <typename TKey> class IEntity
+{
+  public:
+    virtual ~IEntity() = default;
+};
 
-enum class GCADEntityType {
+enum class GCADEntityType
+{
     Point,
     Line,
     Circle,
@@ -20,13 +27,22 @@ enum class GCADEntityType {
 
 class GCADEntity
 {
-public:
+  public:
     explicit GCADEntity(GCADEntityType type);
     virtual ~GCADEntity() = default;
 
-    GCADEntityType type() const noexcept { return m_type; }
-    const QString &id() const noexcept { return m_id; }
-    void setId(QString id) { m_id = std::move(id); }
+    GCADEntityType type() const noexcept
+    {
+        return m_type;
+    }
+    const QString &id() const noexcept
+    {
+        return m_id;
+    }
+    void setId(QString id)
+    {
+        m_id = std::move(id);
+    }
 
     QString layerName{QStringLiteral("0")};
     QString lineTypeName{QStringLiteral("BYLAYER")};
@@ -36,7 +52,7 @@ public:
 
     virtual QRectF bounds() const = 0;
 
-private:
+  private:
     GCADEntityType m_type;
     QString m_id;
 };

@@ -1,5 +1,5 @@
 #include "Tools/Navigation/GWindowZoomTool.hpp"
-#include "View/CAD/GCADView.hpp"
+#include "Graphics/GCADView.hpp"
 #include <QMouseEvent>
 namespace totcad {
 GWindowZoomTool::GWindowZoomTool(GCADView *view, QObject *parent) : GCADTool(view, parent) {}
