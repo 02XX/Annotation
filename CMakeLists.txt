@@ -22,12 +22,6 @@ include(cmake/CompilerWarnings.cmake)
 include(cmake/Sanitizers.cmake)
 include(cmake/Doxygen.cmake)
 
-# ---- Tests ----
-option(BUILD_TESTS "Build the test suite" ON)
-if(BUILD_TESTS)
-  enable_testing()
-endif()
-
 # ---- Engine source ----
 add_subdirectory(totcad)
 

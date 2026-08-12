@@ -4,18 +4,18 @@
 
 #include <sstream>
 
-namespace {
+namespace
+{
 
 TEST(DXFReaderTest, ReadsSectionsTablesBlocksAndEntities)
 {
-    std::istringstream input{
-        "0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n"
-        "0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n70\n1\n"
-        "0\nLAYER\n2\nWALL\n62\n1\n6\nCONTINUOUS\n0\nENDTAB\n0\nENDSEC\n"
-        "0\nSECTION\n2\nBLOCKS\n0\nBLOCK\n2\nDOOR\n10\n0\n20\n0\n"
-        "0\nLINE\n10\n0\n20\n0\n11\n1\n21\n0\n0\nENDBLK\n0\nENDSEC\n"
-        "0\nSECTION\n2\nENTITIES\n0\nLINE\n5\nA1\n8\nWALL\n"
-        "10\n1\n20\n2\n11\n4\n21\n6\n0\nENDSEC\n0\nEOF\n"};
+    std::istringstream input{"0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n"
+                             "0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n70\n1\n"
+                             "0\nLAYER\n2\nWALL\n62\n1\n6\nCONTINUOUS\n0\nENDTAB\n0\nENDSEC\n"
+                             "0\nSECTION\n2\nBLOCKS\n0\nBLOCK\n2\nDOOR\n10\n0\n20\n0\n"
+                             "0\nLINE\n10\n0\n20\n0\n11\n1\n21\n0\n0\nENDBLK\n0\nENDSEC\n"
+                             "0\nSECTION\n2\nENTITIES\n0\nLINE\n5\nA1\n8\nWALL\n"
+                             "10\n1\n20\n2\n11\n4\n21\n6\n0\nENDSEC\n0\nEOF\n"};
 
     totcad::dxf::DXFDocument document;
     std::string error;

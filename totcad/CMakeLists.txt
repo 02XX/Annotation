@@ -50,7 +50,10 @@ set_target_properties(
         MACOSX_BUNDLE TRUE
         WIN32_EXECUTABLE TRUE
 )
+# ---- Tests ----
+option(BUILD_TESTS "Build the test suite" ON)
 
 if(BUILD_TESTS)
+  enable_testing()
   add_subdirectory(tests)
 endif()
