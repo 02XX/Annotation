@@ -1,5 +1,4 @@
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
 file(GLOB_RECURSE ANNOTATION_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE ANNOTATION_HEADERS CONFIGURE_DEPENDS include/*.hpp)
@@ -20,9 +19,9 @@ add_library(
 target_link_libraries(
     AnnotationCore
     PUBLIC
-        Qt${QT_VERSION_MAJOR}::Core
-        Qt${QT_VERSION_MAJOR}::Gui
-        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt5::Core
+        Qt5::Gui
+        Qt5::Widgets
 )
 
 target_include_directories(AnnotationCore PUBLIC include)

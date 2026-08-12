@@ -1,6 +1,7 @@
 #include "DXF/GDXFReader.hpp"
 
 #include <QFile>
+#include <QTextCodec>
 #include <QTextStream>
 
 namespace totcad {
@@ -15,6 +16,7 @@ bool GDXFReader::readFile(const QString &filePath, QVector<GDXFGroup> &groups, Q
     }
 
     QTextStream stream(&file);
+    stream.setCodec(QTextCodec::codecForLocale());
     groups.clear();
     int lineNumber = 0;
     while (!stream.atEnd()) {

@@ -122,11 +122,7 @@ void GCADView::mouseReleaseEvent(QMouseEvent *event)
 void GCADView::wheelEvent(QWheelEvent *event)
 {
     const qreal factor = qPow(1.0015, static_cast<qreal>(event->angleDelta().y()));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    zoomBy(factor, event->position().toPoint());
-#else
     zoomBy(factor, event->pos());
-#endif
     event->accept();
 }
 
