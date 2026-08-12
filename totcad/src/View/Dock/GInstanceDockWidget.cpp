@@ -30,20 +30,43 @@ void GInstanceDockWidget::setModel(GInstanceTreeModel *model)
     m_tree->setModel(model);
     connect(m_tree->selectionModel(), &QItemSelectionModel::currentChanged, this,
             [this](const QModelIndex &, const QModelIndex &) {
+                if (m_modelResetting)
+                    return;
+                m_currentInstanceId = m_model ? m_model->instanceId(m_tree->currentIndex()) : QString{};
                 updateActions();
-                const QString id = currentInstanceId();
-                if (!id.isEmpty()) emit instanceActivated(id);
+                if (!m_currentInstanceId.isEmpty()) emit instanceActivated(m_currentInstanceId);
             });
+    connect(model, &QAbstractItemModel::modelAboutToBeReset, this, [this] {
+        m_modelResetting = true;
+    });
     connect(model, &QAbstractItemModel::modelReset, this, [this] {
+        m_modelResetting = false;
         m_tree->expandAll();
-        updateActions();
+        const QModelIndex target = m_model->indexForInstanceId(m_currentInstanceId);
+        if (target.isValid()) {
+            selectInstance(m_currentInstanceId);
+        } else {
+            m_currentInstanceId.clear();
+            updateActions();
+        }
     });
     m_tree->expandAll();
     updateActions();
 }
 QString GInstanceDockWidget::currentInstanceId() const
 {
-    return m_model ? m_model->instanceId(m_tree->currentIndex()) : QString{};
+    return m_currentInstanceId;
+}
+void GInstanceDockWidget::selectInstance(const QString &instanceId)
+{
+    if (!m_model)
+        return;
+    const QModelIndex target = m_model->indexForInstanceId(instanceId);
+    if (!target.isValid())
+        return;
+    m_tree->expand(target.parent());
+    m_tree->setCurrentIndex(target);
+    m_tree->scrollTo(target);
 }
 void GInstanceDockWidget::updateActions()
 {

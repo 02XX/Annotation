@@ -20,6 +20,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     QString typeId(int row) const;
+    int rowForTypeId(const QString &typeId) const;
 
 private:
     GAnnotationDocument *m_document;

@@ -5,6 +5,12 @@
 namespace totcad {
 
 struct GDXFGroup {
+    GDXFGroup() = default;
+    GDXFGroup(int groupCode, const QString &groupValue, int sourceLine)
+        : code(groupCode), value(groupValue), lineNumber(sourceLine)
+    {
+    }
+
     int code{0};
     QString value;
     int lineNumber{0};

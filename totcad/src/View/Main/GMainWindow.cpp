@@ -202,12 +202,15 @@ void GMainWindow::createMenusAndToolbars()
         statusBar()->showMessage(tr("选择图元，右键确认；Esc 清除选择/退出命令"));
     });
     connect(m_instanceAnnotationAction, &QAction::triggered, this, [this] {
-        if (m_instanceDock->currentInstanceId().isEmpty()) {
+        const QString instanceId = m_instanceDock->currentInstanceId();
+        if (instanceId.isEmpty()) {
             QMessageBox::information(this, tr("实例标注"), tr("请先新增并选中一个实例。"));
             m_instanceAnnotationAction->setChecked(false);
             return;
         }
         m_toolController->activate(GToolController::Mode::InstanceAnnotation);
+        if (const GAnnotationInstance *instance = m_annotationDocument->instance(instanceId))
+            m_cadScene->selectEntityIds(instance->entityIds.values());
         statusBar()->showMessage(tr("选择图元，右键确认；Esc 清除选择/退出命令"));
     });
     connect(m_realtimeZoomAction, &QAction::triggered, this, [this] { m_toolController->activate(GToolController::Mode::RealtimeZoom); });
@@ -261,15 +264,23 @@ void GMainWindow::connectWorkspace()
         const QColor color = QColorDialog::getColor(type->color, this, tr("选择标注颜色"));
         if (color.isValid()) m_annotationController->changeTypeColor(id, color);
     });
-    connect(m_typeDock, &GTypeDockWidget::currentTypeChanged,
-            m_instanceModel, &GInstanceTreeModel::setCurrentType);
+    connect(m_typeDock, &GTypeDockWidget::currentTypeChanged, this, [this](const QString &typeId) {
+        m_instanceModel->setCurrentType(typeId);
+        if (m_toolController->mode() == GToolController::Mode::InstanceAnnotation)
+            m_cadScene->clearSelection();
+    });
     connect(m_instanceDock, &GInstanceDockWidget::addRequested, this, [this] {
-        m_annotationController->addInstance(m_typeDock->currentTypeId());
+        const QString instanceId = m_annotationController->addInstance(m_typeDock->currentTypeId());
+        m_instanceDock->selectInstance(instanceId);
     });
     connect(m_instanceDock, &GInstanceDockWidget::deleteRequested,
             m_annotationController, &GAnnotationController::deleteInstance);
     connect(m_instanceDock, &GInstanceDockWidget::instanceActivated, this, [this](const QString &instanceId) {
         m_cadView->zoomToSceneRect(m_cadScene->instanceBounds(instanceId), 0.8);
+        if (m_toolController->mode() == GToolController::Mode::InstanceAnnotation) {
+            if (const GAnnotationInstance *instance = m_annotationDocument->instance(instanceId))
+                m_cadScene->selectEntityIds(instance->entityIds.values());
+        }
     });
     connect(m_toolController, &GToolController::typeAssignmentRequested, this, [this](const QStringList &ids) {
         m_annotationController->assignType(ids, m_typeDock->currentTypeId());
@@ -308,6 +319,8 @@ bool GMainWindow::openFile(const QString &filePath)
     m_layerModel->setDocument(m_cadDocument);
     m_cadScene->rebuild();
     m_cadView->showAll();
+    if (m_typeModel->rowCount() > 0)
+        m_typeDock->selectRow(0);
     updateRecentFiles();
     updateStatus();
     updateActionStates();
@@ -405,7 +418,7 @@ void GMainWindow::updateWindowTitle()
 {
     QString title = tr("矢量图 AI 标注工具");
     if (m_documentController->hasDocument())
-        title = QStringLiteral("%1%2 — %3")
+        title = QStringLiteral("%1%2 - %3")
                     .arg(m_documentController->isModified() ? QStringLiteral("*") : QString{},
                          QFileInfo(m_cadDocument->sourcePath).fileName(), title);
     setWindowTitle(title);

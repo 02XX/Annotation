@@ -44,13 +44,32 @@ void GTypeDockWidget::setModel(GTypeTableModel *model)
     m_table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     connect(m_table->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             [this](const QModelIndex &, const QModelIndex &) {
+                if (m_modelResetting)
+                    return;
+                m_currentTypeId = m_model ? m_model->typeId(currentRow()) : QString{};
                 updateActions();
-                emit currentTypeChanged(currentTypeId());
+                emit currentTypeChanged(m_currentTypeId);
             });
-    connect(model, &QAbstractItemModel::modelReset, this, [this] { updateActions(); });
+    connect(model, &QAbstractItemModel::modelAboutToBeReset, this, [this] {
+        m_modelResetting = true;
+        m_rowBeforeReset = currentRow();
+    });
+    connect(model, &QAbstractItemModel::modelReset, this, [this] {
+        m_modelResetting = false;
+        int row = m_model->rowForTypeId(m_currentTypeId);
+        if (row < 0 && m_model->rowCount() > 0)
+            row = qBound(0, m_rowBeforeReset, m_model->rowCount() - 1);
+        if (row >= 0) {
+            selectRow(row);
+        } else {
+            m_currentTypeId.clear();
+            updateActions();
+            emit currentTypeChanged({});
+        }
+    });
     updateActions();
 }
-QString GTypeDockWidget::currentTypeId() const { return m_model ? m_model->typeId(currentRow()) : QString{}; }
+QString GTypeDockWidget::currentTypeId() const { return m_currentTypeId; }
 int GTypeDockWidget::currentRow() const { return m_table->currentIndex().row(); }
 void GTypeDockWidget::selectRow(int row)
 {

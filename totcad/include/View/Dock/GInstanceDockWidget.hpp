@@ -1,5 +1,6 @@
 #pragma once
 #include <QDockWidget>
+#include <QString>
 class QAction;
 class QTreeView;
 namespace totcad {
@@ -10,6 +11,7 @@ public:
     explicit GInstanceDockWidget(QWidget *parent = nullptr);
     void setModel(GInstanceTreeModel *model);
     QString currentInstanceId() const;
+    void selectInstance(const QString &instanceId);
 signals:
     void addRequested();
     void deleteRequested(const QString &instanceId);
@@ -20,5 +22,7 @@ private:
     QTreeView *m_tree{nullptr};
     QAction *m_addAction{nullptr};
     QAction *m_deleteAction{nullptr};
+    QString m_currentInstanceId;
+    bool m_modelResetting{false};
 };
 } // namespace totcad

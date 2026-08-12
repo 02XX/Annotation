@@ -1,5 +1,6 @@
 #pragma once
 #include <QDockWidget>
+#include <QString>
 class QAction;
 class QModelIndex;
 class QTableView;
@@ -26,5 +27,8 @@ private:
     QAction *m_deleteAction{nullptr};
     QAction *m_upAction{nullptr};
     QAction *m_downAction{nullptr};
+    QString m_currentTypeId;
+    int m_rowBeforeReset{-1};
+    bool m_modelResetting{false};
 };
 } // namespace totcad

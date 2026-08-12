@@ -25,6 +25,7 @@ public:
     void refreshStyles();
     void refreshInstanceBoxes();
     QStringList selectedEntityIds() const;
+    void selectEntityIds(const QStringList &entityIds);
     QRectF instanceBounds(const QString &instanceId) const;
 
 private:

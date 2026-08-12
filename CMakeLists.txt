@@ -10,9 +10,16 @@ project(
 
 
 # ---- C++ Standard ----
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# The project is developed with Visual Studio 2015 and contains UTF-8
+# source files with Chinese UI text. Keep MSVC's normal exception flags and
+# add UTF-8 as an extra compile option instead of replacing CMAKE_CXX_FLAGS.
+if(MSVC)
+  add_compile_options(/utf-8)
+endif()
 
 # ---- Export compile commands ----
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

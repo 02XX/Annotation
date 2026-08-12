@@ -96,4 +96,16 @@ QString GInstanceTreeModel::instanceId(const QModelIndex &indexValue) const
     return indexValue.row() < values.size() ? values.at(indexValue.row()).id : QString{};
 }
 
+QModelIndex GInstanceTreeModel::indexForInstanceId(const QString &instanceIdValue) const
+{
+    if (instanceIdValue.isEmpty() || m_typeId.isEmpty())
+        return {};
+    const auto values = m_document->instancesForType(m_typeId);
+    for (int row = 0; row < values.size(); ++row) {
+        if (values.at(row).id == instanceIdValue)
+            return index(row, 0, index(0, 0));
+    }
+    return {};
+}
+
 } // namespace totcad

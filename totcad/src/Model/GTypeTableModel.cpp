@@ -13,7 +13,10 @@ GTypeTableModel::GTypeTableModel(GAnnotationDocument *document, QUndoStack *undo
 {
     const auto refresh = [this] { beginResetModel(); endResetModel(); };
     connect(document, &GAnnotationDocument::typesChanged, this, refresh);
-    connect(document, &GAnnotationDocument::assignmentsChanged, this, refresh);
+    connect(document, &GAnnotationDocument::assignmentsChanged, this, [this] {
+        if (rowCount() > 0)
+            emit dataChanged(index(0, 2), index(rowCount() - 1, 2));
+    });
 }
 
 int GTypeTableModel::rowCount(const QModelIndex &parent) const { return parent.isValid() ? 0 : m_document->types().size(); }
@@ -68,6 +71,15 @@ bool GTypeTableModel::setData(const QModelIndex &index, const QVariant &value, i
 QString GTypeTableModel::typeId(int row) const
 {
     return row >= 0 && row < m_document->types().size() ? m_document->types().at(row).id : QString{};
+}
+
+int GTypeTableModel::rowForTypeId(const QString &typeIdValue) const
+{
+    for (int row = 0; row < m_document->types().size(); ++row) {
+        if (m_document->types().at(row).id == typeIdValue)
+            return row;
+    }
+    return -1;
 }
 
 } // namespace totcad

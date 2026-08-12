@@ -341,4 +341,13 @@ QStringList GCADScene::selectedEntityIds() const
     return ids.values();
 }
 
+void GCADScene::selectEntityIds(const QStringList &entityIds)
+{
+    clearSelection();
+    for (const QString &entityId : entityIds) {
+        for (GCADEntityItem *item : m_entityItems.value(entityId))
+            item->setSelected(true);
+    }
+}
+
 } // namespace totcad

@@ -24,7 +24,14 @@ void GAnnotationController::addType() { m_undoStack->push(new GAddTypeCommand(m_
 void GAnnotationController::deleteType(const QString &id) { if (!id.isEmpty()) m_undoStack->push(new GDeleteTypeCommand(m_document, id)); }
 void GAnnotationController::moveType(const QString &id, int offset) { if (!id.isEmpty()) m_undoStack->push(new GMoveTypeCommand(m_document, id, offset)); }
 void GAnnotationController::changeTypeColor(const QString &id, const QColor &color) { if (!id.isEmpty() && color.isValid()) m_undoStack->push(new GChangeTypeColorCommand(m_document, id, color)); }
-void GAnnotationController::addInstance(const QString &typeId) { if (!typeId.isEmpty()) m_undoStack->push(new GAddInstanceCommand(m_document, typeId)); }
+QString GAnnotationController::addInstance(const QString &typeId)
+{
+    if (typeId.isEmpty())
+        return {};
+    auto *command = new GAddInstanceCommand(m_document, typeId);
+    m_undoStack->push(command);
+    return command->createdId();
+}
 void GAnnotationController::deleteInstance(const QString &id) { if (!id.isEmpty()) m_undoStack->push(new GDeleteInstanceCommand(m_document, id)); }
 void GAnnotationController::assignType(const QStringList &ids, const QString &typeId) { if (!ids.isEmpty() && !typeId.isEmpty()) m_undoStack->push(new GAssignTypeCommand(m_document, ids, typeId)); }
 void GAnnotationController::assignInstance(const QStringList &ids, const QString &instanceId) { if (!ids.isEmpty() && !instanceId.isEmpty()) m_undoStack->push(new GAssignInstanceCommand(m_document, ids, instanceId)); }

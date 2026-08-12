@@ -10,7 +10,7 @@ TEST(GAnnotationSerializerTest, RoundTripsAnnotationRelations)
 {
     QTemporaryDir directory;
     ASSERT_TRUE(directory.isValid());
-    const QString filePath = directory.filePath(QStringLiteral("drawing.json"));
+    const QString filePath = directory.path() + QStringLiteral("/drawing.json");
 
     totcad::GAnnotationDocument source;
     const QString type = source.addType(QStringLiteral("沙发"), QColor(QStringLiteral("#12AB34")));

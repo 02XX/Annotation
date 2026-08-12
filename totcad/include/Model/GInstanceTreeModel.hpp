@@ -25,6 +25,7 @@ public:
     void setCurrentType(const QString &typeId);
     QString currentType() const { return m_typeId; }
     QString instanceId(const QModelIndex &index) const;
+    QModelIndex indexForInstanceId(const QString &instanceId) const;
 
 private:
     GAnnotationDocument *m_document;

@@ -20,7 +20,7 @@ public:
     void deleteType(const QString &typeId);
     void moveType(const QString &typeId, int offset);
     void changeTypeColor(const QString &typeId, const QColor &color);
-    void addInstance(const QString &typeId);
+    QString addInstance(const QString &typeId);
     void deleteInstance(const QString &instanceId);
     void assignType(const QStringList &entityIds, const QString &typeId);
     void assignInstance(const QStringList &entityIds, const QString &instanceId);

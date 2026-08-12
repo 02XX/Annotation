@@ -7,7 +7,44 @@ namespace totcad {
 namespace {
 QString newId()
 {
-    return QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QString id = QUuid::createUuid().toString();
+    id.remove(QLatin1Char('{'));
+    id.remove(QLatin1Char('}'));
+    return id;
+}
+
+bool sameTypeDefinitions(const QVector<GAnnotationType> &left,
+                         const QVector<GAnnotationType> &right)
+{
+    if (left.size() != right.size())
+        return false;
+    for (int index = 0; index < left.size(); ++index) {
+        const GAnnotationType &leftType = left.at(index);
+        const GAnnotationType &rightType = right.at(index);
+        if (leftType.id != rightType.id
+            || leftType.name != rightType.name
+            || leftType.color != rightType.color) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool sameInstanceDefinitions(const QVector<GAnnotationInstance> &left,
+                             const QVector<GAnnotationInstance> &right)
+{
+    if (left.size() != right.size())
+        return false;
+    for (int index = 0; index < left.size(); ++index) {
+        const GAnnotationInstance &leftInstance = left.at(index);
+        const GAnnotationInstance &rightInstance = right.at(index);
+        if (leftInstance.id != rightInstance.id
+            || leftInstance.typeId != rightInstance.typeId
+            || leftInstance.name != rightInstance.name) {
+            return false;
+        }
+    }
+    return true;
 }
 }
 
@@ -214,7 +251,6 @@ void GAnnotationDocument::assignType(const QStringList &entityIds, const QString
         }
     }
     markDirty();
-    emit instancesChanged();
     emit assignmentsChanged();
 }
 
@@ -234,7 +270,6 @@ void GAnnotationDocument::assignInstance(const QStringList &entityIds, const QSt
         m_entityTypes.insert(entityId, targetType);
     }
     markDirty();
-    emit instancesChanged();
     emit assignmentsChanged();
 }
 
@@ -247,7 +282,6 @@ void GAnnotationDocument::clearAssignments(const QStringList &entityIds)
         m_entityTypes.remove(entityId);
     }
     markDirty();
-    emit instancesChanged();
     emit assignmentsChanged();
 }
 
@@ -258,6 +292,8 @@ GAnnotationSnapshot GAnnotationDocument::snapshot() const
 
 void GAnnotationDocument::restore(const GAnnotationSnapshot &value, bool markDocumentDirty)
 {
+    const bool typeDefinitionsChanged = !sameTypeDefinitions(m_types, value.types);
+    const bool instanceDefinitionsChanged = !sameInstanceDefinitions(m_instances, value.instances);
     m_types = value.types;
     m_instances = value.instances;
     m_entityTypes = value.entityTypes;
@@ -265,8 +301,10 @@ void GAnnotationDocument::restore(const GAnnotationSnapshot &value, bool markDoc
     if (markDocumentDirty)
         markDirty();
     emit documentReset();
-    emit typesChanged();
-    emit instancesChanged();
+    if (typeDefinitionsChanged)
+        emit typesChanged();
+    if (instanceDefinitionsChanged)
+        emit instancesChanged();
     emit assignmentsChanged();
 }
 

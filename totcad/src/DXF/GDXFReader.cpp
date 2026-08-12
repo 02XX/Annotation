@@ -38,7 +38,7 @@ bool GDXFReader::readFile(const QString &filePath, QVector<GDXFGroup> &groups, Q
                 *errorMessage = QObject::tr("DXF 第 %1 行的组码无效：%2").arg(lineNumber - 1).arg(codeLine);
             return false;
         }
-        groups.append({code, valueLine.trimmed(), lineNumber - 1});
+        groups.append(GDXFGroup(code, valueLine.trimmed(), lineNumber - 1));
     }
     return true;
 }
